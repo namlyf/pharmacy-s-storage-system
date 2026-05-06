@@ -1,15 +1,10 @@
 package com.hospital.pharmacy.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "receiving_logbooks")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class ReceivingLogbook {
 
     @Id
@@ -33,4 +28,24 @@ public class ReceivingLogbook {
     @ManyToOne
     @JoinColumn(name = "entered_by", nullable = false)
     private Account enteredBy;
+
+    public ReceivingLogbook() {}
+
+    public Long getLogId() { return logId; }
+    public void setLogId(Long logId) { this.logId = logId; }
+
+    public WarehouseReceipt getWarehouseReceipt() { return warehouseReceipt; }
+    public void setWarehouseReceipt(WarehouseReceipt warehouseReceipt) { this.warehouseReceipt = warehouseReceipt; }
+
+    public DrugBatch getDrugBatch() { return drugBatch; }
+    public void setDrugBatch(DrugBatch drugBatch) { this.drugBatch = drugBatch; }
+
+    public LocalDate getEntryDate() { return entryDate; }
+    public void setEntryDate(LocalDate entryDate) { this.entryDate = entryDate; }
+
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public Account getEnteredBy() { return enteredBy; }
+    public void setEnteredBy(Account enteredBy) { this.enteredBy = enteredBy; }
 }

@@ -1,15 +1,10 @@
 package com.hospital.pharmacy.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "drug_requisitions")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class DrugRequisition {
 
     @Id
@@ -43,8 +38,35 @@ public class DrugRequisition {
     private Status status;
 
     public enum Status {
-        PENDING,    // Chờ duyệt
-        APPROVED,   // Đã duyệt
-        REJECTED    // Từ chối
+        PENDING, APPROVED, REJECTED
     }
+
+    public DrugRequisition() {}
+
+    public Long getRequisitionId() { return requisitionId; }
+    public void setRequisitionId(Long requisitionId) { this.requisitionId = requisitionId; }
+
+    public Account getCreatedBy() { return createdBy; }
+    public void setCreatedBy(Account createdBy) { this.createdBy = createdBy; }
+
+    public String getMedicineName() { return medicineName; }
+    public void setMedicineName(String medicineName) { this.medicineName = medicineName; }
+
+    public String getDosage() { return dosage; }
+    public void setDosage(String dosage) { this.dosage = dosage; }
+
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+
+    public LocalDate getRequisitionDate() { return requisitionDate; }
+    public void setRequisitionDate(LocalDate requisitionDate) { this.requisitionDate = requisitionDate; }
+
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
+
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
 }

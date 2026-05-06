@@ -1,14 +1,9 @@
 package com.hospital.pharmacy.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "accounts")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Account {
 
     @Id
@@ -29,8 +24,23 @@ public class Account {
     private Role role;
 
     public enum Role {
-        MANAGER,
-        PHARMACIST,
-        WAREHOUSE_STAFF
+        MANAGER, PHARMACIST, WAREHOUSE_STAFF
     }
+
+    public Account() {}
+
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
+
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
+
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
 }

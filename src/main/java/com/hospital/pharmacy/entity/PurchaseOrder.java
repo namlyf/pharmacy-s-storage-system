@@ -1,16 +1,11 @@
 package com.hospital.pharmacy.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "purchase_orders")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class PurchaseOrder {
 
     @Id
@@ -40,8 +35,29 @@ public class PurchaseOrder {
     private List<OrderItem> orderItems;
 
     public enum Status {
-        PENDING,    // Chờ xử lý
-        SENT,       // Đã gửi NCC
-        RECEIVED    // Đã nhận hàng
+        PENDING, SENT, RECEIVED
     }
+
+    public PurchaseOrder() {}
+
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
+
+    public DrugRequisition getRequisition() { return requisition; }
+    public void setRequisition(DrugRequisition requisition) { this.requisition = requisition; }
+
+    public Supplier getSupplier() { return supplier; }
+    public void setSupplier(Supplier supplier) { this.supplier = supplier; }
+
+    public Account getCreatedBy() { return createdBy; }
+    public void setCreatedBy(Account createdBy) { this.createdBy = createdBy; }
+
+    public LocalDate getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDate orderDate) { this.orderDate = orderDate; }
+
+    public Status getStatus() { return status; }
+    public void setStatus(Status status) { this.status = status; }
+
+    public List<OrderItem> getOrderItems() { return orderItems; }
+    public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
 }

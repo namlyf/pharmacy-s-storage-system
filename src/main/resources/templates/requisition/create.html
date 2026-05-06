@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tạo dự trù thuốc</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        .navbar { background: #2c7be5; color: white; padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center; }
+        .navbar a { color: white; text-decoration: none;
+            background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 4px; font-size: 14px; }
+        .container { padding: 24px; max-width: 600px; margin: 0 auto; }
+        .form-box { background: white; padding: 32px; border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-top: 24px; }
+        h2 { margin-bottom: 24px; color: #333; }
+        label { display: block; margin-bottom: 6px; font-size: 14px; color: #444; font-weight: bold; }
+        input, textarea, select {
+            width: 100%; padding: 10px 14px; border: 1px solid #ddd;
+            border-radius: 6px; margin-bottom: 16px; font-size: 15px; font-family: Arial;
+        }
+        input:focus, textarea:focus { outline: none; border-color: #2c7be5; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .btn { padding: 10px 24px; border-radius: 4px; border: none;
+            cursor: pointer; font-size: 15px; }
+        .btn-primary { background: #2c7be5; color: white; }
+        .btn-secondary { background: #6c757d; color: white; text-decoration: none;
+            padding: 10px 24px; border-radius: 4px; font-size: 15px; }
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar('📋 Tạo phiếu dự trù (BM.01)')}"></div>
+
+<div class="container">
+    <div class="form-box">
+        <h2>Thông tin phiếu dự trù</h2>
+        <form th:action="@{/requisitions/create}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+            <label>Tên thuốc / Hoạt chất *</label>
+            <input type="text" name="medicineName" placeholder="VD: Paracetamol" required/>
+
+            <div class="row">
+                <div>
+                    <label>Hàm lượng</label>
+                    <input type="text" name="dosage" placeholder="VD: 500mg"/>
+                </div>
+                <div>
+                    <label>Đơn vị *</label>
+                    <input type="text" name="unit" placeholder="VD: Viên, Lọ, Hộp" required/>
+                </div>
+            </div>
+
+            <label>Số lượng *</label>
+            <input type="number" name="quantity" min="1" placeholder="Nhập số lượng" required/>
+
+            <label>Lý do dự trù *</label>
+            <textarea name="reason" rows="3" placeholder="Nhập lý do dự trù..." required></textarea>
+
+            <div style="display:flex; gap:12px; margin-top:8px;">
+                <button type="submit" class="btn btn-primary">💾 Lưu phiếu dự trù</button>
+                <a th:href="@{/requisitions}" class="btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

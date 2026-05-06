@@ -1,16 +1,11 @@
 package com.hospital.pharmacy.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "warehouse_receipts")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class WarehouseReceipt {
 
     @Id
@@ -38,4 +33,27 @@ public class WarehouseReceipt {
     @ManyToOne
     @JoinColumn(name = "approved_by")
     private Account approvedBy;
+
+    public WarehouseReceipt() {}
+
+    public Long getReceiptId() { return receiptId; }
+    public void setReceiptId(Long receiptId) { this.receiptId = receiptId; }
+
+    public InspectionReport getInspectionReport() { return inspectionReport; }
+    public void setInspectionReport(InspectionReport inspectionReport) { this.inspectionReport = inspectionReport; }
+
+    public DrugBatch getDrugBatch() { return drugBatch; }
+    public void setDrugBatch(DrugBatch drugBatch) { this.drugBatch = drugBatch; }
+
+    public LocalDate getReceiptDate() { return receiptDate; }
+    public void setReceiptDate(LocalDate receiptDate) { this.receiptDate = receiptDate; }
+
+    public Account getEnteredBy() { return enteredBy; }
+    public void setEnteredBy(Account enteredBy) { this.enteredBy = enteredBy; }
+
+    public BigDecimal getRetailPrice() { return retailPrice; }
+    public void setRetailPrice(BigDecimal retailPrice) { this.retailPrice = retailPrice; }
+
+    public Account getApprovedBy() { return approvedBy; }
+    public void setApprovedBy(Account approvedBy) { this.approvedBy = approvedBy; }
 }

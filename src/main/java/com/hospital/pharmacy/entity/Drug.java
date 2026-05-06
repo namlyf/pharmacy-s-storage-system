@@ -1,14 +1,9 @@
 package com.hospital.pharmacy.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity
 @Table(name = "drugs")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Drug {
 
     @Id
@@ -32,8 +27,26 @@ public class Drug {
     private Category category;
 
     public enum Category {
-        MEDICINE,       // Thuốc
-        SUPPLEMENT,     // Thực phẩm chức năng
-        COSMETIC        // Mỹ phẩm
+        MEDICINE, SUPPLEMENT, COSMETIC
     }
+
+    public Drug() {}
+
+    public Long getDrugId() { return drugId; }
+    public void setDrugId(Long drugId) { this.drugId = drugId; }
+
+    public String getDrugName() { return drugName; }
+    public void setDrugName(String drugName) { this.drugName = drugName; }
+
+    public String getConcentration() { return concentration; }
+    public void setConcentration(String concentration) { this.concentration = concentration; }
+
+    public String getDosageForm() { return dosageForm; }
+    public void setDosageForm(String dosageForm) { this.dosageForm = dosageForm; }
+
+    public String getRegistrationNumber() { return registrationNumber; }
+    public void setRegistrationNumber(String registrationNumber) { this.registrationNumber = registrationNumber; }
+
+    public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 }

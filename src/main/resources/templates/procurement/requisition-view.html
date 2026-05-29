@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head('View Forecast')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/purchase/requisitions">Procurement</a></li>
+            <li class="breadcrumb-item active">View Forecast</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-file-earmark-text"></i> Forecast Details</h4>
+        <div class="d-flex align-items-center gap-3">
+            <div th:if="${(req.overallStatus.name() == 'APPROVED' || req.overallStatus.name() == 'PARTIALLY_APPROVED')}" 
+                 sec:authorize="hasRole('PHARMACIST')">
+                <form th:action="@{/purchase/orders/generate/{id}(id=${req.requisitionID})}" method="post">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-cart-plus"></i> Generate Purchase Orders
+                    </button>
+                </form>
+            </div>
+            <span class="badge p-2 fs-6"
+                  th:classappend="${req.overallStatus.name() == 'APPROVED' ? 'bg-success' : 
+                                 (req.overallStatus.name() == 'PENDING' ? 'bg-warning' : 
+                                 (req.overallStatus.name() == 'REJECTED' ? 'bg-danger' : 'bg-info'))}"
+                  th:text="${req.overallStatus}"></span>
+        </div>
+    </div>
+    <hr>
+
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <table class="table table-sm">
+                <tr>
+                    <th style="width: 40%;">Created By:</th>
+                    <td th:text="${req.createdBy.fullName}"></td>
+                </tr>
+                <tr>
+                    <th>Created Date:</th>
+                    <td th:text="${req.createdDate}"></td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-body py-2">
+                    <small class="text-muted d-block">Notes:</small>
+                    <span th:text="${req.notes != null && !req.notes.empty ? req.notes : 'No notes provided.'}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-white fw-bold">Items to Procure</div>
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Drug Name</th>
+                        <th>Qty</th>
+                        <th>Preferred Supplier</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th sec:authorize="hasRole('MANAGER')" class="text-center">Approval</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${req.items}">
+                        <td>
+                            <strong th:text="${item.drug.drugName}"></strong><br>
+                            <small class="text-muted" th:text="${item.drug.activeIngredient}"></small>
+                        </td>
+                        <td th:text="${item.quantity + ' ' + item.unit}"></td>
+                        <td th:text="${item.preferredSupplier != null ? item.preferredSupplier.supplierName : '-'}"></td>
+                        <td th:text="${item.reason}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${item.approvalStatus.name() == 'APPROVED' ? 'bg-success' : 
+                                                 (item.approvalStatus.name() == 'REJECTED' ? 'bg-danger' : 'bg-warning')}"
+                                  th:text="${item.approvalStatus}"></span>
+                            <div th:if="${item.approvalStatus.name() == 'REJECTED'}" class="small text-danger mt-1">
+                                <i class="bi bi-x-circle"></i> [[${item.rejectionReason}]]
+                            </div>
+                        </td>
+                        <td sec:authorize="hasRole('MANAGER')" class="text-center">
+                            <div th:if="${item.approvalStatus.name() == 'PENDING'}" class="d-flex justify-content-center gap-2">
+                                <form th:action="@{/purchase/requisitions/item/approve/{id}(id=${item.itemID})}" method="post">
+                                    <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-lg"></i> Approve
+                                    </button>
+                                </form>
+                                <button type="button" class="btn btn-sm btn-danger" 
+                                        data-bs-toggle="modal" 
+                                        th:data-bs-target="'#rejectModal-' + ${item.itemID}">
+                                    <i class="bi bi-x-lg"></i> Reject
+                                </button>
+
+                                <!-- Reject Modal -->
+                                <div class="modal fade" th:id="'rejectModal-' + ${item.itemID}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form th:action="@{/purchase/requisitions/item/reject/{id}(id=${item.itemID})}" method="post">
+                                                <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Reject Item</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body text-start">
+                                                    <p>Are you sure you want to reject <strong>[[${item.drug.drugName}]]</strong>?</p>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Rejection Reason</label>
+                                                        <textarea name="rejectionReason" class="form-control" required rows="3"></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-danger">Confirm Reject</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <span th:unless="${item.approvalStatus.name() == 'PENDING'}" class="text-muted small">
+                                Processed by [[${item.approvedBy.fullName}]]
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

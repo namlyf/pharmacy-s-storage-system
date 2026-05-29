@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head('Register Batch')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/purchase/orders/view/{id}(id=${order.orderID})}">Order Details</a></li>
+            <li class="breadcrumb-item active">Register Batch</li>
+        </ol>
+    </nav>
+
+    <h4><i class="bi bi-box-seam"></i> Register Incoming Drug Batch</h4>
+    <p class="text-muted">Registering batch for: <strong th:text="${drug.drugName}"></strong> (Order: <span th:text="${order.orderID}"></span>)</p>
+    <hr>
+
+    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
+
+    <form th:action="@{/warehouse/batches/create}" th:object="${batchRequest}" method="post" class="row g-3">
+        <input type="hidden" th:field="*{orderId}">
+        <input type="hidden" th:field="*{drugId}">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light fw-bold">Batch Information</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Lot Number (Số lô)</label>
+                        <input type="text" th:field="*{lotNumber}" class="form-control" required placeholder="e.g. LOT12345">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Manufacture Date</label>
+                            <input type="date" th:field="*{manufactureDate}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Expiration Date (HSD)</label>
+                            <input type="date" th:field="*{expirationDate}" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity Received</label>
+                        <input type="number" th:field="*{quantityReceived}" class="form-control" required min="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light fw-bold">Invoice & Storage</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Invoice Number (Số hóa đơn)</label>
+                        <input type="text" th:field="*{invoiceNumber}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Invoice Date</label>
+                        <input type="date" th:field="*{invoiceDate}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Storage Condition (Required on Label)</label>
+                        <input type="text" th:field="*{storageCondition}" class="form-control" 
+                               th:placeholder="${drug.storageCondition}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 mt-4 mb-5">
+            <button type="submit" class="btn btn-primary px-5">
+                <i class="bi bi-check-circle"></i> Register Batch
+            </button>
+            <a th:href="@{/purchase/orders/view/{id}(id=${order.orderID})}" class="btn btn-secondary px-4 ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

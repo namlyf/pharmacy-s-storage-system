@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head('Drug Batches')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-boxes"></i> Registered Drug Batches</h4>
+    </div>
+
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Drug Name</th>
+                        <th>Lot Number</th>
+                        <th>HSD</th>
+                        <th>Qty Received</th>
+                        <th>Invoice No</th>
+                        <th>Supplier</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="b : ${batches}">
+                        <td th:text="${b.drug.drugName}"></td>
+                        <td><code th:text="${b.lotNumber}"></code></td>
+                        <td th:text="${b.expirationDate}"></td>
+                        <td th:text="${b.quantityReceived}"></td>
+                        <td th:text="${b.invoiceNumber}"></td>
+                        <td th:text="${b.order.supplier.supplierName}"></td>
+                        <td>
+                            <div sec:authorize="hasRole('WAREHOUSE_STAFF')">
+                                <a th:href="@{/inspection/reports/create(batchId=${b.batchID})}" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="bi bi-clipboard-check"></i> Inspect
+                                </a>
+                            </div>
+                            <span sec:authorize="!hasRole('WAREHOUSE_STAFF')" class="badge bg-info">REGISTERED</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${batches.empty}">
+                        <td colspan="7" class="text-center py-4 text-muted">No drug batches registered yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head('View Inspection Report')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/inspection/reports">Inspection Reports</a></li>
+            <li class="breadcrumb-item active">View Report</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-clipboard-check"></i> Inspection Report Details</h4>
+        <div class="d-flex align-items-center gap-3">
+            <div th:if="${report.status.name() == 'APPROVED'}" sec:authorize="hasRole('WAREHOUSE_STAFF')">
+                <a th:href="@{/warehouse/receipts/create(reportId=${report.reportID})}" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-down"></i> Issue Warehouse Receipt
+                </a>
+            </div>
+            <span class="badge p-2 fs-6"
+                  th:classappend="${report.status.name() == 'APPROVED' ? 'bg-success' : 
+                                 (report.status.name() == 'PENDING' ? 'bg-warning' : 'bg-danger')}"
+                  th:text="${report.status}"></span>
+        </div>
+    </div>
+    <hr>
+
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
+
+    <div class="row">
+        <!-- Left: Batch & Inspection Info -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-bold">Batch Information</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <tr><th class="ps-3" style="width: 40%;">Drug:</th><td th:text="${report.batch.drug.drugName}"></td></tr>
+                        <tr><th class="ps-3">Lot Number:</th><td><code th:text="${report.batch.lotNumber}"></code></td></tr>
+                        <tr><th class="ps-3">Registration No:</th><td th:text="${report.batch.drug.registrationNumber}"></td></tr>
+                        <tr><th class="ps-3">Expiration Date:</th><td th:text="${report.batch.expirationDate}"></td></tr>
+                        <tr><th class="ps-3">VAT Import Price:</th><td><strong th:text="${#numbers.formatDecimal(report.vatPrice, 0, 'COMMA', 2, 'POINT') + ' VND'}"></strong></td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-bold">System Validations</div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <tr>
+                            <th class="ps-3" style="width: 40%;">SĐK Validity:</th>
+                            <td>
+                                <span th:if="${report.sdkValid}" class="text-success"><i class="bi bi-check-circle-fill"></i> VALID</span>
+                                <span th:unless="${report.sdkValid}" class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> UNRECOGNIZED FORMAT</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="ps-3">Shelf Life (>12m):</th>
+                            <td>
+                                <span th:if="${report.shelfLifeValid}" class="text-success"><i class="bi bi-check-circle-fill"></i> VALID</span>
+                                <span th:unless="${report.shelfLifeValid}" class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> TOO SHORT</span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Assessment Result -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light fw-bold">Quality Assessment</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Manual Checks:</small>
+                        <ul class="list-unstyled mb-0">
+                            <li>
+                                <i th:class="${report.invoiceValid ? 'bi bi-check-lg text-success' : 'bi bi-x-lg text-danger'}"></i>
+                                Invoice is valid
+                            </li>
+                            <li>
+                                <i th:class="${report.storageConditionMatch ? 'bi bi-check-lg text-success' : 'bi bi-x-lg text-danger'}"></i>
+                                Storage condition matches
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted d-block">Visual Quality Result:</small>
+                        <p class="mb-0 border-start ps-3 py-1" th:text="${report.visualQualityResult}"></p>
+                    </div>
+                    <div th:if="${report.status.name() == 'REJECTED'}" class="alert alert-danger mt-3 py-2">
+                        <small class="fw-bold">Rejection Reason:</small>
+                        <p class="mb-0" th:text="${report.rejectionReason}"></p>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-muted small">
+                    Inspected by: [[${report.inspectedBy.fullName}]] on [[${report.inspectionDate}]]
+                    <br th:if="${report.approvedBy != null}">
+                    <span th:if="${report.approvedBy != null}">
+                        Processed by: [[${report.approvedBy.fullName}]] on [[${#temporals.format(report.approvedAt, 'yyyy-MM-dd HH:mm')}]]
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manager Actions -->
+    <div th:if="${report.status.name() == 'PENDING'}" sec:authorize="hasRole('MANAGER')" class="d-flex gap-2 mb-5">
+        <form th:action="@{/inspection/reports/approve/{id}(id=${report.reportID})}" method="post">
+            <button type="submit" class="btn btn-success px-5">
+                <i class="bi bi-check-lg"></i> Approve Report
+            </button>
+        </form>
+        <button type="button" class="btn btn-danger px-5" data-bs-toggle="modal" data-bs-target="#rejectModal">
+            <i class="bi bi-x-lg"></i> Reject Report
+        </button>
+
+        <!-- Reject Modal -->
+        <div class="modal fade" id="rejectModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form th:action="@{/inspection/reports/reject/{id}(id=${report.reportID})}" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Reject Inspection Report</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Reason for Rejection</label>
+                                <textarea name="reason" class="form-control" required rows="4"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-danger">Confirm Reject</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

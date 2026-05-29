@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout/base :: head('Stock Form')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container mt-4" style="max-width: 700px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <span th:if="${stockId == null}">
+                    <i class="bi bi-plus-circle"></i> Add Stock Entry
+                </span>
+                <span th:unless="${stockId == null}">
+                    <i class="bi bi-pencil"></i> Edit Stock –
+                    <span th:text="${drugName}"></span>
+                </span>
+            </h5>
+        </div>
+        <div class="card-body">
+            <form th:action="${stockId == null} ?
+                              '/inventory/stocks/create' :
+                              '/inventory/stocks/edit/' + ${stockId}"
+                  th:object="${stockRequest}" method="post">
+
+                <div class="row g-3">
+
+                    <!-- Drug select – chỉ hiện khi tạo mới -->
+                    <div class="col-12" th:if="${stockId == null}">
+                        <label class="form-label fw-bold">Drug *</label>
+                        <select th:field="*{drugId}" class="form-select"
+                                th:classappend="${#fields.hasErrors('drugId')} ? ' is-invalid'">
+                            <option value="">-- Select Drug --</option>
+                            <option th:each="drug : ${drugs}"
+                                    th:value="${drug.drugID}"
+                                    th:text="${drug.drugName} + ' – ' + ${drug.concentration}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback"
+                             th:errors="*{drugId}"></div>
+                    </div>
+                    
+                    <input type="hidden" th:unless="${stockId == null}" th:field="*{drugId}">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Current Quantity *</label>
+                        <input type="number" th:field="*{currentQuantity}"
+                               class="form-control" min="0"
+                               th:classappend="${#fields.hasErrors('currentQuantity')} ? ' is-invalid'">
+                        <div class="invalid-feedback"
+                             th:errors="*{currentQuantity}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">
+                            Minimum Threshold *
+                        </label>
+                        <input type="number" th:field="*{minimumThreshold}"
+                               class="form-control" min="0"
+                               th:classappend="${#fields.hasErrors('minimumThreshold')} ? ' is-invalid'">
+                        <small class="text-muted">
+                            Alert shows when stock falls to this level.
+                        </small>
+                        <div class="invalid-feedback"
+                             th:errors="*{minimumThreshold}"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Storage Location</label>
+                        <input type="text" th:field="*{storageLocation}"
+                               class="form-control"
+                               placeholder="e.g. Shelf A3, Cold Room 1">
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save
+                    </button>
+                    <a href="/inventory/dashboard"
+                       class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

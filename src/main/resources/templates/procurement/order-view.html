@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head('View Order')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/purchase/orders">Purchase Orders</a></li>
+            <li class="breadcrumb-item active">View Order</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-cart-check"></i> Purchase Order Details</h4>
+        <div>
+            <span class="badge p-2 fs-6"
+                  th:classappend="${order.status.name() == 'SENT' ? 'bg-primary' : 
+                                 (order.status.name() == 'DRAFT' ? 'bg-secondary' : 
+                                 (order.status.name() == 'RECEIVED' ? 'bg-success' : 'bg-info'))}"
+                  th:text="${order.status}"></span>
+        </div>
+    </div>
+    <hr>
+
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <table class="table table-sm">
+                <tr>
+                    <th style="width: 40%;">Supplier:</th>
+                    <td><strong th:text="${order.supplier.supplierName}"></strong></td>
+                </tr>
+                <tr>
+                    <th>Order Date:</th>
+                    <td th:text="${order.orderDate}"></td>
+                </tr>
+                <tr>
+                    <th>Created By:</th>
+                    <td th:text="${order.createdBy.fullName}"></td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-6 text-end">
+            <div th:if="${order.status.name() == 'DRAFT'}" sec:authorize="hasRole('PHARMACIST')">
+                <form th:action="@{/purchase/orders/send/{id}(id=${order.orderID})}" method="post">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Mark as SENT
+                    </button>
+                </form>
+            </div>
+            <div th:if="${order.status.name() == 'SENT'}">
+                <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="bi bi-printer"></i> Print BM.02
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-white fw-bold">Order Items</div>
+        <div class="card-body p-0">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Drug Name</th>
+                        <th>Qty</th>
+                        <th>Unit</th>
+                        <th>Packaging Spec</th>
+                        <th sec:authorize="hasRole('WAREHOUSE_STAFF')">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${order.items}">
+                        <td th:text="${item.drug.drugName}"></td>
+                        <td th:text="${item.quantity}"></td>
+                        <td th:text="${item.unit}"></td>
+                        <td th:text="${item.packagingSpec}"></td>
+                        <td sec:authorize="hasRole('WAREHOUSE_STAFF')">
+                            <div th:if="${order.status.name() == 'SENT' || order.status.name() == 'RECEIVED'}">
+                                <a th:href="@{/warehouse/batches/create(orderId=${order.orderID}, drugId=${item.drug.drugID})}" 
+                                   class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-box-seam"></i> Register Batch
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

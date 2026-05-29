@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{layout/base :: head('Dashboard')}"></head>
+<body>
+<div th:replace="~{layout/base :: navbar}"></div>
+
+<div class="container-fluid mt-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4><i class="bi bi-speedometer2"></i> Inventory Dashboard</h4>
+        <span class="text-muted" th:text="${#temporals.format(#temporals.createNow(), 'EEEE, dd MMMM yyyy')}"></span>
+    </div>
+    <hr>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title opacity-75">Total Products</h6>
+                            <h2 class="mb-0" th:text="${totalDrugs}">0</h2>
+                        </div>
+                        <i class="bi bi-capsule fs-1 opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 text-white"
+                 th:classappend="${lowStockCount > 0} ? 'bg-danger' : 'bg-success'">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title opacity-75">Low Stock Alerts</h6>
+                            <h2 class="mb-0" th:text="${lowStockCount}">0</h2>
+                        </div>
+                        <i class="bi bi-exclamation-triangle fs-1 opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title opacity-75">Medicines</h6>
+                            <h2 class="mb-0" th:text="${medicineCount}">0</h2>
+                        </div>
+                        <i class="bi bi-bandaid fs-1 opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 bg-secondary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title opacity-75">Other Categories</h6>
+                            <h2 class="mb-0" th:text="${supplementCount + cosmeticCount}">0</h2>
+                        </div>
+                        <i class="bi bi-tag fs-1 opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Low Stock Alert Table -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-bell text-danger"></i> Urgent Procurement Needs</span>
+                    <a href="/inventory/stocks?lowStock=true" class="btn btn-sm btn-link text-decoration-none">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Drug Name</th>
+                                <th>Current Qty</th>
+                                <th>Min Threshold</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="s : ${lowStocks}">
+                                <td>
+                                    <strong th:text="${s.drug.drugName}"></strong><br>
+                                    <small class="text-muted" th:text="${s.drug.activeIngredient}"></small>
+                                </td>
+                                <td><span class="badge bg-danger p-2" th:text="${s.currentQuantity}"></span></td>
+                                <td th:text="${s.minimumThreshold}"></td>
+                                <td><span class="badge bg-light text-dark border" th:text="${s.drug.category}"></span></td>
+                                <td>
+                                    <a th:href="@{/purchase/requisitions/create(drugId=${s.drug.drugID})}"
+                                       class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-file-earmark-plus"></i> Forecast
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr th:if="${lowStocks.empty}">
+                                <td colspan="5" class="text-center py-4 text-success">
+                                    <i class="bi bi-check-circle"></i> All stock levels are healthy.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Info / Classification -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white fw-bold">Classification Summary</div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">Medicines (VN/VD)</small>
+                        <div class="progress mt-1" style="height: 10px;">
+                            <div class="progress-bar bg-info" role="progressbar" 
+                                 th:style="'width: ' + (${totalDrugs > 0 ? (medicineCount * 100 / totalDrugs) : 0}) + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Supplements (YT/ATTP)</small>
+                        <div class="progress mt-1" style="height: 10px;">
+                            <div class="progress-bar bg-warning" role="progressbar" 
+                                 th:style="'width: ' + (${totalDrugs > 0 ? (supplementCount * 100 / totalDrugs) : 0}) + '%'"></div>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <small class="text-muted">Cosmetics (MP/CBMP)</small>
+                        <div class="progress mt-1" style="height: 10px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 th:style="'width: ' + (${totalDrugs > 0 ? (cosmeticCount * 100 / totalDrugs) : 0}) + '%'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white fw-bold">Recent Activity</div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush small">
+                        <li class="list-group-item py-2 border-0 border-bottom">
+                            <i class="bi bi-plus-circle text-success me-2"></i> New Drug added to catalog
+                        </li>
+                        <li class="list-group-item py-2 border-0 border-bottom">
+                            <i class="bi bi-box-arrow-in-down text-primary me-2"></i> Shipment received (Lot: ABC123)
+                        </li>
+                        <li class="list-group-item py-2 border-0">
+                            <i class="bi bi-clipboard-check text-info me-2"></i> Inspection approved for Insulin
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

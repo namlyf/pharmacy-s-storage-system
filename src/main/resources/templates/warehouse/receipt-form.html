@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Create Warehouse Receipt')}"></head>
+<head th:replace="~{layout/base :: head('Lập Phiếu Nhập Kho')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a th:href="@{/inspection/reports/view/{id}(id=${report.reportID})}">Inspection Report</a></li>
-            <li class="breadcrumb-item active">Issue Warehouse Receipt</li>
+            <li class="breadcrumb-item"><a th:href="@{/inspection/reports/view/{id}(id=${report.reportID})}">Biên bản kiểm nhập</a></li>
+            <li class="breadcrumb-item active">Lập phiếu nhập kho</li>
         </ol>
     </nav>
 
-    <h4><i class="bi bi-receipt-cutoff"></i> BM.04 Warehouse Receipt (Form C21)</h4>
+    <h4><i class="bi bi-receipt-cutoff"></i> BM.04 Phiếu nhập kho (Mẫu C21)</h4>
     <hr>
 
     <div class="row mb-4">
@@ -21,10 +21,10 @@
             <div class="card bg-light border-0">
                 <div class="card-body py-3">
                     <div class="row">
-                        <div class="col-md-3"><strong>Drug:</strong> <span th:text="${report.batch.drug.drugName}"></span></div>
-                        <div class="col-md-3"><strong>Lot No:</strong> <code th:text="${report.batch.lotNumber}"></code></div>
-                        <div class="col-md-3"><strong>Qty:</strong> <span th:text="${report.batch.quantityReceived}"></span></div>
-                        <div class="col-md-3"><strong>Import Price:</strong> <span th:text="${#numbers.formatDecimal(report.vatPrice, 0, 'COMMA', 2, 'POINT') + ' VND'}"></span></div>
+                        <div class="col-md-3"><strong>Thuốc:</strong> <span th:text="${report.batch.drug.drugName}"></span></div>
+                        <div class="col-md-3"><strong>Số lô:</strong> <code th:text="${report.batch.lotNumber}"></code></div>
+                        <div class="col-md-3"><strong>Số lượng:</strong> <span th:text="${report.batch.quantityReceived}"></span></div>
+                        <div class="col-md-3"><strong>Giá nhập:</strong> <span th:text="${#numbers.formatDecimal(report.vatPrice, 0, 'COMMA', 0, 'POINT') + ' VND'}"></span></div>
                     </div>
                 </div>
             </div>
@@ -37,18 +37,18 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card shadow-sm mb-4 h-100">
-                    <div class="card-header bg-white fw-bold">Receipt Details</div>
+                    <div class="card-header bg-white fw-bold">Thông tin phiếu nhập</div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">Receipt Date</label>
+                            <label class="form-label">Ngày nhập kho</label>
                             <input type="date" th:field="*{receiptDate}" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Barcode (Mã vạch)</label>
+                            <label class="form-label">Mã vạch (Barcode)</label>
                             <input type="text" th:field="*{barcode}" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Accounting Code (Mã kế toán)</label>
+                            <label class="form-label">Mã kế toán</label>
                             <input type="text" th:field="*{accountingCode}" class="form-control">
                         </div>
                     </div>
@@ -57,10 +57,10 @@
 
             <div class="col-md-6">
                 <div class="card shadow-sm mb-4 h-100">
-                    <div class="card-header bg-white fw-bold">Pricing</div>
+                    <div class="card-header bg-white fw-bold">Giá bán niêm yết</div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">Health Insurance Price (Giá BHYT)</label>
+                            <label class="form-label">Giá BHYT</label>
                             <div class="input-group">
                                 <input type="number" th:field="*{bhytPrice}" class="form-control" step="0.01">
                                 <span class="input-group-text">VND</span>
@@ -68,8 +68,8 @@
                         </div>
                         <div class="alert alert-warning small">
                             <i class="bi bi-info-circle"></i> 
-                            The <strong>Retail Price</strong> will be calculated automatically upon submission 
-                            using the 5-tier markup schedule defined in SOP 01-GPP.
+                            <strong>Giá bán lẻ</strong> sẽ được hệ thống tự động tính toán sau khi lưu dựa trên 
+                            biểu thặng số 5 tầng quy định tại SOP 01-GPP.
                         </div>
                     </div>
                 </div>
@@ -78,9 +78,9 @@
 
         <div class="mt-4">
             <button type="submit" class="btn btn-success px-5">
-                <i class="bi bi-box-arrow-in-down"></i> Confirm Warehouse Entry
+                <i class="bi bi-box-arrow-in-down"></i> Xác nhận nhập kho
             </button>
-            <a th:href="@{/inspection/reports/view/{id}(id=${report.reportID})}" class="btn btn-secondary px-4 ms-2">Cancel</a>
+            <a th:href="@{/inspection/reports/view/{id}(id=${report.reportID})}" class="btn btn-secondary px-4 ms-2">Hủy bỏ</a>
         </div>
     </form>
 </div>

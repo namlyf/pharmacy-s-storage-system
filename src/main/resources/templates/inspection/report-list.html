@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Inspection Reports')}"></head>
+<head th:replace="~{layout/base :: head('Danh sách biên bản kiểm nhập')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-clipboard-check"></i> BM.03 Receiving Inspection Reports</h4>
+        <h4><i class="bi bi-clipboard-check"></i> BM.03 Danh sách biên bản kiểm nhập</h4>
     </div>
 
     <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
@@ -17,12 +17,12 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Date</th>
-                        <th>Drug Name</th>
-                        <th>Lot Number</th>
-                        <th>Inspected By</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Ngày lập</th>
+                        <th>Tên thuốc</th>
+                        <th>Số lô</th>
+                        <th>Người kiểm nhập</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -35,17 +35,17 @@
                             <span class="badge"
                                   th:classappend="${r.status.name() == 'APPROVED' ? 'bg-success' : 
                                                  (r.status.name() == 'PENDING' ? 'bg-warning' : 'bg-danger')}"
-                                  th:text="${r.status}"></span>
+                                  th:text="${r.status.name() == 'APPROVED' ? 'Đã phê duyệt' : (r.status.name() == 'PENDING' ? 'Chờ duyệt' : 'Từ chối')}"></span>
                         </td>
                         <td>
                             <a th:href="@{/inspection/reports/view/{id}(id=${r.reportID})}"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> View
+                                <i class="bi bi-eye"></i> Xem
                             </a>
                         </td>
                     </tr>
                     <tr th:if="${reports.empty}">
-                        <td colspan="6" class="text-center py-4 text-muted">No inspection reports found.</td>
+                        <td colspan="6" class="text-center py-4 text-muted">Chưa có biên bản kiểm nhập nào.</td>
                     </tr>
                 </tbody>
             </table>

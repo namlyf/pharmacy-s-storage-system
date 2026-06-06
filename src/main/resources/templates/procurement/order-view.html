@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('View Order')}"></head>
+<head th:replace="~{layout/base :: head('Chi tiết đơn hàng')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/purchase/orders">Purchase Orders</a></li>
-            <li class="breadcrumb-item active">View Order</li>
+            <li class="breadcrumb-item"><a href="/purchase/orders">Đơn đặt hàng</a></li>
+            <li class="breadcrumb-item active">Chi tiết đơn hàng</li>
         </ol>
     </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-cart-check"></i> Purchase Order Details</h4>
+        <h4><i class="bi bi-cart-check"></i> Chi tiết đơn đặt hàng</h4>
         <div>
             <span class="badge p-2 fs-6"
                   th:classappend="${order.status.name() == 'SENT' ? 'bg-primary' : 
@@ -32,15 +32,15 @@
         <div class="col-md-6">
             <table class="table table-sm">
                 <tr>
-                    <th style="width: 40%;">Supplier:</th>
+                    <th style="width: 40%;">Nhà cung cấp:</th>
                     <td><strong th:text="${order.supplier.supplierName}"></strong></td>
                 </tr>
                 <tr>
-                    <th>Order Date:</th>
+                    <th>Ngày đặt:</th>
                     <td th:text="${order.orderDate}"></td>
                 </tr>
                 <tr>
-                    <th>Created By:</th>
+                    <th>Người tạo:</th>
                     <td th:text="${order.createdBy.fullName}"></td>
                 </tr>
             </table>
@@ -49,29 +49,29 @@
             <div th:if="${order.status.name() == 'DRAFT'}" sec:authorize="hasRole('PHARMACIST')">
                 <form th:action="@{/purchase/orders/send/{id}(id=${order.orderID})}" method="post">
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-send"></i> Mark as SENT
+                        <i class="bi bi-send"></i> Đánh dấu đã gửi
                     </button>
                 </form>
             </div>
             <div th:if="${order.status.name() == 'SENT'}">
                 <button class="btn btn-outline-secondary" onclick="window.print()">
-                    <i class="bi bi-printer"></i> Print BM.02
+                    <i class="bi bi-printer"></i> In biểu mẫu BM.02
                 </button>
             </div>
         </div>
     </div>
 
     <div class="card shadow-sm mb-5">
-        <div class="card-header bg-white fw-bold">Order Items</div>
+        <div class="card-header bg-white fw-bold">Danh mục hàng hóa</div>
         <div class="card-body p-0">
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Drug Name</th>
-                        <th>Qty</th>
-                        <th>Unit</th>
-                        <th>Packaging Spec</th>
-                        <th sec:authorize="hasRole('WAREHOUSE_STAFF')">Actions</th>
+                        <th>Tên thuốc</th>
+                        <th>Số lượng</th>
+                        <th>Đơn vị</th>
+                        <th>Quy cách đóng gói</th>
+                        <th sec:authorize="hasRole('WAREHOUSE_STAFF')">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -84,7 +84,7 @@
                             <div th:if="${order.status.name() == 'SENT' || order.status.name() == 'RECEIVED'}">
                                 <a th:href="@{/warehouse/batches/create(orderId=${order.orderID}, drugId=${item.drug.drugID})}" 
                                    class="btn btn-sm btn-outline-info">
-                                    <i class="bi bi-box-seam"></i> Register Batch
+                                    <i class="bi bi-box-seam"></i> Đăng ký lô hàng
                                 </a>
                             </div>
                         </td>

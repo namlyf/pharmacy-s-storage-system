@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Purchase Orders')}"></head>
+<head th:replace="~{layout/base :: head('Đơn đặt hàng')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-cart-check"></i> BM.02 Purchase Orders</h4>
+        <h4><i class="bi bi-cart-check"></i> BM.02 Đơn đặt hàng</h4>
     </div>
 
     <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
@@ -18,11 +18,11 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Order Date</th>
-                        <th>Supplier</th>
-                        <th>Created By</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Ngày đặt</th>
+                        <th>Nhà cung cấp</th>
+                        <th>Người tạo</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,12 +40,12 @@
                         <td>
                             <a th:href="@{/purchase/orders/view/{id}(id=${o.orderID})}"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> View
+                                <i class="bi bi-eye"></i> Xem chi tiết
                             </a>
                         </td>
                     </tr>
                     <tr th:if="${orders.empty}">
-                        <td colspan="5" class="text-center py-4 text-muted">No purchase orders found.</td>
+                        <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy đơn đặt hàng nào.</td>
                     </tr>
                 </tbody>
             </table>

@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Create Inspection Report')}"></head>
+<head th:replace="~{layout/base :: head('Lập biên bản kiểm nhập')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/warehouse/batches">Drug Batches</a></li>
-            <li class="breadcrumb-item active">New Inspection Report</li>
+            <li class="breadcrumb-item"><a href="/warehouse/batches">Lô hàng về</a></li>
+            <li class="breadcrumb-item active">Biên bản kiểm nhập mới</li>
         </ol>
     </nav>
 
-    <h4><i class="bi bi-clipboard-plus"></i> BM.03 Receiving Inspection Report</h4>
+    <h4><i class="bi bi-clipboard-plus"></i> BM.03 Biên bản kiểm nhập thuốc</h4>
     <hr>
 
     <div class="row mb-4">
@@ -21,11 +21,11 @@
             <div class="card bg-light border-0">
                 <div class="card-body py-2">
                     <div class="row">
-                        <div class="col-sm-4 text-muted">Drug:</div>
+                        <div class="col-sm-4 text-muted">Thuốc:</div>
                         <div class="col-sm-8"><strong th:text="${batch.drug.drugName}"></strong></div>
-                        <div class="col-sm-4 text-muted">Lot Number:</div>
+                        <div class="col-sm-4 text-muted">Số lô:</div>
                         <div class="col-sm-8"><code th:text="${batch.lotNumber}"></code></div>
-                        <div class="col-sm-4 text-muted">Expiration:</div>
+                        <div class="col-sm-4 text-muted">Hạn sử dụng:</div>
                         <div class="col-sm-8" th:text="${batch.expirationDate}"></div>
                     </div>
                 </div>
@@ -40,21 +40,21 @@
             <!-- Left Column: Dates and Prices -->
             <div class="col-md-6">
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white fw-bold">General Information</div>
+                    <div class="card-header bg-white fw-bold">Thông tin chung</div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label">Inspection Date</label>
+                            <label class="form-label">Ngày kiểm nhập</label>
                             <input type="date" th:field="*{inspectionDate}" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">VAT Import Price (per unit)</label>
+                            <label class="form-label">Giá nhập có VAT (đơn vị nhỏ nhất)</label>
                             <div class="input-group">
                                 <input type="number" th:field="*{vatPrice}" class="form-control" required step="0.01" min="0">
                                 <span class="input-group-text">VND</span>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Storage Temperature (at inspection)</label>
+                            <label class="form-label">Nhiệt độ bảo quản (lúc kiểm)</label>
                             <div class="input-group">
                                 <input type="number" th:field="*{storageTemperature}" class="form-control" step="0.1">
                                 <span class="input-group-text">°C</span>
@@ -64,15 +64,15 @@
                 </div>
 
                 <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white fw-bold">Manual Compliance Checks</div>
+                    <div class="card-header bg-white fw-bold">Kiểm tra tuân thủ thủ công</div>
                     <div class="card-body">
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" th:field="*{invoiceValid}" id="invoiceValid">
-                            <label class="form-check-label" for="invoiceValid">Invoice is present and complete</label>
+                            <label class="form-check-label" for="invoiceValid">Hóa đơn đầy đủ và hợp lệ</label>
                         </div>
                         <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" th:field="*{storageConditionMatch}" id="storageMatch">
-                            <label class="form-check-label" for="storageMatch">Storage at warehouse matches label requirement</label>
+                            <label class="form-check-label" for="storageMatch">Điều kiện bảo quản thực tế khớp với nhãn</label>
                         </div>
                     </div>
                 </div>
@@ -81,36 +81,36 @@
             <!-- Right Column: Visual Quality -->
             <div class="col-md-6">
                 <div class="card shadow-sm mb-4 h-100">
-                    <div class="card-header bg-white fw-bold">Visual Quality Assessment</div>
+                    <div class="card-header bg-white fw-bold">Đánh giá chất lượng cảm quan</div>
                     <div class="card-body">
                         <p class="small text-muted mb-3">
-                            Checklist guidance for: <strong th:text="${batch.drug.dosageForm}"></strong>
+                            Hướng dẫn kiểm tra cho dạng: <strong th:text="${batch.drug.dosageForm}"></strong>
                         </p>
                         <div id="checklistGuidance" class="alert alert-info small py-2 mb-3">
                             <!-- JS will populate this -->
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Assessment Details (Checklist Findings)</label>
+                            <label class="form-label">Chi tiết đánh giá (Ghi chú kết quả)</label>
                             <textarea th:field="*{visualQualityResult}" class="form-control" rows="8" required 
-                                      placeholder="Describe sensory check results..."></textarea>
+                                      placeholder="Mô tả kết quả kiểm tra cảm quan..."></textarea>
                         </div>
                     </div>
 
 <script th:inline="javascript">
     const dosageForm = [[${batch.drug.dosageForm.name()}]];
     const checklists = {
-        'TABLET': '• Color: no discoloration\n• Moisture: rattle test passed\n• Blister integrity: no cracks/chips',
-        'CAPSULE': '• Shell integrity: not torn/open\n• No moisture: rattle test passed\n• No powder in empty slots',
-        'COATED_TABLET': '• Smooth surface: no cracks/peeling\n• No sticking when shaken',
-        'GRANULE': '• Moisture check: rattle test passed',
-        'CREAM': '• Tube intact: not dented\n• Membrane not torn\n• No leakage',
-        'SUPPOSITORY': '• Not melted\n• Intact shape\n• Packaging intact',
-        'SYRUP': '• Clear: no sediment\n• No crystallization\n• No layer separation',
-        'EYE_DROPS': '• Packaging intact\n• No discoloration\n• No sediment',
-        'ORAL_AMPOULE': '• Uniform color\n• Clear\n• "Not for injection" label present',
-        'INJECTION': '• No color change\n• No phase separation\n• No visible particles',
-        'HERBAL': '• No mold or insects',
-        'OTHER': '• General integrity and sensory check'
+        'TABLET': '• Màu sắc: không biến màu\n• Độ ẩm: lắc không dính (thử tiếng vang)\n• Vỉ thuốc: nguyên vẹn, không nứt vỡ',
+        'CAPSULE': '• Vỏ nang: nguyên vẹn, không rách/hở\n• Độ ẩm: lắc không dính\n• Không có bột thuốc rơi ra ngoài',
+        'COATED_TABLET': '• Bề mặt: nhẵn bóng, không nứt/bong tróc\n• Không bị dính khi lắc',
+        'GRANULE': '• Độ ẩm: tơi xốp, không vón cục',
+        'CREAM': '• Tuýp: nguyên vẹn, không móp méo\n• Màng niêm phong: còn nguyên\n• Không rò rỉ thuốc',
+        'SUPPOSITORY': '• Không bị chảy, giữ nguyên hình dạng\n• Bao bì nguyên vẹn',
+        'SYRUP': '• Trong suốt: không có vật thể lạ\n• Không kết tinh, không tách lớp',
+        'EYE_DROPS': '• Bao bì nguyên vẹn\n• Không biến màu, không kết tủa',
+        'ORAL_AMPOULE': '• Màu sắc đồng nhất, trong suốt\n• Nhãn có dòng chữ "Không được tiêm"',
+        'INJECTION': '• Không đổi màu, không tách lớp\n• Không có tiểu phân nhìn thấy bằng mắt thường',
+        'HERBAL': '• Không nấm mốc hay côn trùng',
+        'OTHER': '• Kiểm tra tính nguyên vẹn và cảm quan chung'
     };
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -124,9 +124,9 @@
 
         <div class="mt-3">
             <button type="submit" class="btn btn-primary px-5">
-                <i class="bi bi-send-check"></i> Submit Inspection Report
+                <i class="bi bi-send-check"></i> Gửi biên bản kiểm nhập
             </button>
-            <a href="/warehouse/batches" class="btn btn-secondary px-4 ms-2">Cancel</a>
+            <a href="/warehouse/batches" class="btn btn-secondary px-4 ms-2">Hủy bỏ</a>
         </div>
     </form>
 </div>

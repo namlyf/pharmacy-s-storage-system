@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('View Inspection Report')}"></head>
+<head th:replace="~{layout/base :: head('Xem biên bản kiểm nhập')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/inspection/reports">Inspection Reports</a></li>
-            <li class="breadcrumb-item active">View Report</li>
+            <li class="breadcrumb-item"><a href="/inspection/reports">Danh sách biên bản</a></li>
+            <li class="breadcrumb-item active">Chi tiết biên bản</li>
         </ol>
     </nav>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-clipboard-check"></i> Inspection Report Details</h4>
+        <h4><i class="bi bi-clipboard-check"></i> Chi tiết biên bản kiểm nhập</h4>
         <div class="d-flex align-items-center gap-3">
             <div th:if="${report.status.name() == 'APPROVED'}" sec:authorize="hasRole('WAREHOUSE_STAFF')">
                 <a th:href="@{/warehouse/receipts/create(reportId=${report.reportID})}" class="btn btn-primary">
-                    <i class="bi bi-box-arrow-in-down"></i> Issue Warehouse Receipt
+                    <i class="bi bi-box-arrow-in-down"></i> Lập phiếu nhập kho
                 </a>
             </div>
             <span class="badge p-2 fs-6"
                   th:classappend="${report.status.name() == 'APPROVED' ? 'bg-success' : 
                                  (report.status.name() == 'PENDING' ? 'bg-warning' : 'bg-danger')}"
-                  th:text="${report.status}"></span>
+                  th:text="${report.status.name() == 'APPROVED' ? 'Đã phê duyệt' : (report.status.name() == 'PENDING' ? 'Chờ duyệt' : 'Từ chối')}"></span>
         </div>
     </div>
     <hr>
@@ -36,34 +36,34 @@
         <!-- Left: Batch & Inspection Info -->
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light fw-bold">Batch Information</div>
+                <div class="card-header bg-light fw-bold">Thông tin lô hàng</div>
                 <div class="card-body p-0">
                     <table class="table table-sm mb-0">
-                        <tr><th class="ps-3" style="width: 40%;">Drug:</th><td th:text="${report.batch.drug.drugName}"></td></tr>
-                        <tr><th class="ps-3">Lot Number:</th><td><code th:text="${report.batch.lotNumber}"></code></td></tr>
-                        <tr><th class="ps-3">Registration No:</th><td th:text="${report.batch.drug.registrationNumber}"></td></tr>
-                        <tr><th class="ps-3">Expiration Date:</th><td th:text="${report.batch.expirationDate}"></td></tr>
-                        <tr><th class="ps-3">VAT Import Price:</th><td><strong th:text="${#numbers.formatDecimal(report.vatPrice, 0, 'COMMA', 2, 'POINT') + ' VND'}"></strong></td></tr>
+                        <tr><th class="ps-3" style="width: 40%;">Tên thuốc:</th><td th:text="${report.batch.drug.drugName}"></td></tr>
+                        <tr><th class="ps-3">Số lô:</th><td><code th:text="${report.batch.lotNumber}"></code></td></tr>
+                        <tr><th class="ps-3">Số đăng ký (SĐK):</th><td th:text="${report.batch.drug.registrationNumber}"></td></tr>
+                        <tr><th class="ps-3">Hạn sử dụng:</th><td th:text="${report.batch.expirationDate}"></td></tr>
+                        <tr><th class="ps-3">Giá nhập (VAT):</th><td><strong th:text="${#numbers.formatDecimal(report.vatPrice, 0, 'COMMA', 0, 'POINT') + ' VND'}"></strong></td></tr>
                     </table>
                 </div>
             </div>
 
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light fw-bold">System Validations</div>
+                <div class="card-header bg-light fw-bold">Hệ thống tự động kiểm tra</div>
                 <div class="card-body p-0">
                     <table class="table table-sm mb-0">
                         <tr>
-                            <th class="ps-3" style="width: 40%;">SĐK Validity:</th>
+                            <th class="ps-3" style="width: 40%;">Định dạng SĐK:</th>
                             <td>
-                                <span th:if="${report.sdkValid}" class="text-success"><i class="bi bi-check-circle-fill"></i> VALID</span>
-                                <span th:unless="${report.sdkValid}" class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> UNRECOGNIZED FORMAT</span>
+                                <span th:if="${report.sdkValid}" class="text-success"><i class="bi bi-check-circle-fill"></i> HỢP LỆ</span>
+                                <span th:unless="${report.sdkValid}" class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> SAI ĐỊNH DẠNG</span>
                             </td>
                         </tr>
                         <tr>
-                            <th class="ps-3">Shelf Life (>12m):</th>
+                            <th class="ps-3">Hạn dùng (>12 tháng):</th>
                             <td>
-                                <span th:if="${report.shelfLifeValid}" class="text-success"><i class="bi bi-check-circle-fill"></i> VALID</span>
-                                <span th:unless="${report.shelfLifeValid}" class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> TOO SHORT</span>
+                                <span th:if="${report.shelfLifeValid}" class="text-success"><i class="bi bi-check-circle-fill"></i> HỢP LỆ</span>
+                                <span th:unless="${report.shelfLifeValid}" class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> QUÁ NGẮN</span>
                             </td>
                         </tr>
                     </table>
@@ -74,35 +74,35 @@
         <!-- Right: Assessment Result -->
         <div class="col-md-6">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light fw-bold">Quality Assessment</div>
+                <div class="card-header bg-light fw-bold">Đánh giá chất lượng</div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <small class="text-muted d-block">Manual Checks:</small>
+                        <small class="text-muted d-block">Kiểm tra thủ công:</small>
                         <ul class="list-unstyled mb-0">
                             <li>
                                 <i th:class="${report.invoiceValid ? 'bi bi-check-lg text-success' : 'bi bi-x-lg text-danger'}"></i>
-                                Invoice is valid
+                                Hóa đơn hợp lệ
                             </li>
                             <li>
                                 <i th:class="${report.storageConditionMatch ? 'bi bi-check-lg text-success' : 'bi bi-x-lg text-danger'}"></i>
-                                Storage condition matches
+                                Điều kiện bảo quản khớp với nhãn
                             </li>
                         </ul>
                     </div>
                     <div class="mb-3">
-                        <small class="text-muted d-block">Visual Quality Result:</small>
+                        <small class="text-muted d-block">Kết quả cảm quan:</small>
                         <p class="mb-0 border-start ps-3 py-1" th:text="${report.visualQualityResult}"></p>
                     </div>
                     <div th:if="${report.status.name() == 'REJECTED'}" class="alert alert-danger mt-3 py-2">
-                        <small class="fw-bold">Rejection Reason:</small>
+                        <small class="fw-bold">Lý do từ chối:</small>
                         <p class="mb-0" th:text="${report.rejectionReason}"></p>
                     </div>
                 </div>
                 <div class="card-footer bg-white text-muted small">
-                    Inspected by: [[${report.inspectedBy.fullName}]] on [[${report.inspectionDate}]]
+                    Kiểm nhập bởi: [[${report.inspectedBy.fullName}]] vào ngày [[${report.inspectionDate}]]
                     <br th:if="${report.approvedBy != null}">
                     <span th:if="${report.approvedBy != null}">
-                        Processed by: [[${report.approvedBy.fullName}]] on [[${#temporals.format(report.approvedAt, 'yyyy-MM-dd HH:mm')}]]
+                        Xử lý bởi: [[${report.approvedBy.fullName}]] vào lúc [[${#temporals.format(report.approvedAt, 'HH:mm dd/MM/yyyy')}]]
                     </span>
                 </div>
             </div>
@@ -113,11 +113,11 @@
     <div th:if="${report.status.name() == 'PENDING'}" sec:authorize="hasRole('MANAGER')" class="d-flex gap-2 mb-5">
         <form th:action="@{/inspection/reports/approve/{id}(id=${report.reportID})}" method="post">
             <button type="submit" class="btn btn-success px-5">
-                <i class="bi bi-check-lg"></i> Approve Report
+                <i class="bi bi-check-lg"></i> Phê duyệt biên bản
             </button>
         </form>
         <button type="button" class="btn btn-danger px-5" data-bs-toggle="modal" data-bs-target="#rejectModal">
-            <i class="bi bi-x-lg"></i> Reject Report
+            <i class="bi bi-x-lg"></i> Từ chối biên bản
         </button>
 
         <!-- Reject Modal -->
@@ -126,18 +126,18 @@
                 <div class="modal-content">
                     <form th:action="@{/inspection/reports/reject/{id}(id=${report.reportID})}" method="post">
                         <div class="modal-header">
-                            <h5 class="modal-title">Reject Inspection Report</h5>
+                            <h5 class="modal-title">Từ chối biên bản kiểm nhập</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label class="form-label">Reason for Rejection</label>
+                                <label class="form-label">Lý do từ chối</label>
                                 <textarea name="reason" class="form-control" required rows="4"></textarea>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-danger">Confirm Reject</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
                         </div>
                     </form>
                 </div>

@@ -22,7 +22,7 @@ public class DataSeeder {
             seedUser("manager", "123456", "Nguyen Lan Hieu", Role.MANAGER);
             seedUser("pharmacist", "123456", "Can Khanh Linh", Role.PHARMACIST);
             seedUser("warehouse", "123456", "Nguyen Thi Hong Hanh", Role.WAREHOUSE_STAFF);
-            System.out.println(">>> Default users synchronized");
+            System.out.println(">>> Dữ liệu người dùng mặc định đã được đồng bộ");
         };
     }
 

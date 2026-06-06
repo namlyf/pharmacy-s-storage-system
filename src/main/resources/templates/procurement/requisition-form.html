@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Create Forecast')}"></head>
+<head th:replace="~{layout/base :: head('Tạo dự trù')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/purchase/requisitions">Procurement</a></li>
-            <li class="breadcrumb-item active">New Forecast</li>
+            <li class="breadcrumb-item"><a href="/purchase/requisitions">Dự trù & Đặt hàng</a></li>
+            <li class="breadcrumb-item active">Dự trù mới</li>
         </ol>
     </nav>
 
-    <h4><i class="bi bi-file-earmark-plus"></i> BM.01 Drug Procurement Forecast</h4>
+    <h4><i class="bi bi-file-earmark-plus"></i> BM.01 Dự trù thuốc</h4>
     <hr>
 
     <form th:action="@{/purchase/requisitions/create}" th:object="${requisitionRequest}" method="post">
         
         <div class="card mb-4">
-            <div class="card-header bg-light fw-bold">General Information</div>
+            <div class="card-header bg-light fw-bold">Thông tin chung</div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label">Notes</label>
+                    <label class="form-label">Ghi chú</label>
                     <textarea th:field="*{notes}" class="form-control" rows="2" 
-                              placeholder="General notes for this procurement cycle..."></textarea>
+                              placeholder="Ghi chú chung cho đợt dự trù này..."></textarea>
                 </div>
             </div>
         </div>
 
         <div class="card mb-4">
             <div class="card-header bg-light fw-bold d-flex justify-content-between align-items-center">
-                Requested Drugs
+                Danh mục thuốc dự trù
                 <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRow()">
-                    <i class="bi bi-plus-lg"></i> Add Row
+                    <i class="bi bi-plus-lg"></i> Thêm dòng
                 </button>
             </div>
             <div class="card-body p-0">
                 <table class="table table-bordered mb-0" id="itemsTable">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 30%;">Drug</th>
-                            <th style="width: 10%;">Qty</th>
-                            <th style="width: 10%;">Unit</th>
-                            <th style="width: 20%;">Preferred Supplier</th>
-                            <th style="width: 25%;">Reason / Note</th>
+                            <th style="width: 30%;">Thuốc/Vật tư</th>
+                            <th style="width: 10%;">Số lượng</th>
+                            <th style="width: 10%;">Đơn vị</th>
+                            <th style="width: 20%;">Nhà cung cấp dự kiến</th>
+                            <th style="width: 25%;">Lý do / Ghi chú</th>
                             <th style="width: 5%;"></th>
                         </tr>
                     </thead>
@@ -52,7 +52,7 @@
                         <tr th:each="item, stat : *{items}">
                             <td>
                                 <select th:field="*{items[__${stat.index}__].drugId}" class="form-select drug-select" required>
-                                    <option value="">-- Select Drug --</option>
+                                    <option value="">-- Chọn thuốc --</option>
                                     <option th:each="d : ${drugs}" th:value="${d.drugID}" 
                                             th:text="${d.drugName}"
                                             th:data-unit="${d.unit}"
@@ -69,12 +69,12 @@
                             </td>
                             <td>
                                 <select th:field="*{items[__${stat.index}__].preferredSupplierId}" class="form-select">
-                                    <option value="">-- Optional --</option>
+                                    <option value="">-- Tùy chọn --</option>
                                     <option th:each="s : ${suppliers}" th:value="${s.supplierID}" th:text="${s.supplierName}"></option>
                                 </select>
                             </td>
                             <td>
-                                <input type="text" th:field="*{items[__${stat.index}__].reason}" class="form-control" placeholder="e.g. Unusual spike">
+                                <input type="text" th:field="*{items[__${stat.index}__].reason}" class="form-control" placeholder="vd: nhu cầu tăng đột biến">
                             </td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRow(this)">
@@ -89,9 +89,9 @@
 
         <div class="mb-5">
             <button type="submit" class="btn btn-primary px-5">
-                <i class="bi bi-check-lg"></i> Submit Forecast
+                <i class="bi bi-check-lg"></i> Gửi dự trù
             </button>
-            <a href="/purchase/requisitions" class="btn btn-secondary px-4 ms-2">Cancel</a>
+            <a href="/purchase/requisitions" class="btn btn-secondary px-4 ms-2">Hủy</a>
         </div>
     </form>
 </div>

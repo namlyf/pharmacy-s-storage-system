@@ -3,7 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
-    <title th:text="${title} + ' – Pharmacy System'">Pharmacy System</title>
+    <title th:text="${title} + ' – Hệ thống Quản lý Dược'">Hệ thống Quản lý Dược</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet"
@@ -15,50 +15,50 @@
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand fw-bold" href="/inventory/dashboard">
-            <i class="bi bi-hospital"></i> Pharmacy System
+            <i class="bi bi-hospital"></i> Hệ thống Quản lý Dược
         </a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/inventory/dashboard">
-                        <i class="bi bi-grid"></i> Dashboard
+                        <i class="bi bi-grid"></i> Bảng điều khiển
                     </a>
                 </li>
                 
                 <!-- Master Data -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-database"></i> Master Data
+                        <i class="bi bi-database"></i> Danh mục
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/drugs"><i class="bi bi-capsule"></i> Drug Catalog</a></li>
-                        <li><a class="dropdown-item" href="/suppliers"><i class="bi bi-building"></i> Suppliers</a></li>
-                        <li><a class="dropdown-item" href="/inventory/stocks"><i class="bi bi-boxes"></i> Inventory Stock</a></li>
+                        <li><a class="dropdown-item" href="/drugs"><i class="bi bi-capsule"></i> Danh mục thuốc</a></li>
+                        <li><a class="dropdown-item" href="/suppliers"><i class="bi bi-building"></i> Nhà cung cấp</a></li>
+                        <li><a class="dropdown-item" href="/inventory/stocks"><i class="bi bi-boxes"></i> Tồn kho</a></li>
                     </ul>
                 </li>
 
                 <!-- Procurement -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-cart"></i> Procurement
+                        <i class="bi bi-cart"></i> Mua sắm
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/purchase/requisitions"><i class="bi bi-file-earmark-text"></i> BM.01 Forecasts</a></li>
-                        <li><a class="dropdown-item" href="/purchase/orders"><i class="bi bi-cart-check"></i> BM.02 Orders</a></li>
+                        <li><a class="dropdown-item" href="/purchase/requisitions"><i class="bi bi-file-earmark-text"></i> BM.01 Dự trù</a></li>
+                        <li><a class="dropdown-item" href="/purchase/orders"><i class="bi bi-cart-check"></i> BM.02 Đặt hàng</a></li>
                     </ul>
                 </li>
 
                 <!-- Warehouse -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-house-door"></i> Warehouse
+                        <i class="bi bi-house-door"></i> Kho hàng
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/warehouse/batches"><i class="bi bi-box-seam"></i> Drug Batches</a></li>
-                        <li><a class="dropdown-item" href="/inspection/reports"><i class="bi bi-clipboard-check"></i> BM.03 Inspection</a></li>
-                        <li><a class="dropdown-item" href="/warehouse/receipts"><i class="bi bi-receipt"></i> BM.04 Receipts</a></li>
+                        <li><a class="dropdown-item" href="/warehouse/batches"><i class="bi bi-box-seam"></i> Quản lý lô</a></li>
+                        <li><a class="dropdown-item" href="/inspection/reports"><i class="bi bi-clipboard-check"></i> BM.03 Kiểm nhập</a></li>
+                        <li><a class="dropdown-item" href="/warehouse/receipts"><i class="bi bi-receipt"></i> BM.04 Nhập kho</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/warehouse/logbook"><i class="bi bi-journal-text"></i> BM.05 Logbook</a></li>
+                        <li><a class="dropdown-item" href="/warehouse/logbook"><i class="bi bi-journal-text"></i> BM.05 Sổ kiểm nhập</a></li>
                     </ul>
                 </li>
             </ul>
@@ -67,13 +67,13 @@
                     <a class="nav-link dropdown-toggle" href="#"
                        data-bs-toggle="dropdown">
                         <i class="bi bi-person-circle"></i>
-                        <span sec:authentication="name">User</span>
+                        <span sec:authentication="name">Người dùng</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
                             <form th:action="@{/logout}" method="post">
                                 <button class="dropdown-item text-danger">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
                                 </button>
                             </form>
                         </li>

@@ -85,7 +85,7 @@ public class InventoryController {
         try {
             stockService.create(stockRequest);
             redirectAttributes.addFlashAttribute("successMsg",
-                "Stock entry created successfully.");
+                "Đã khởi tạo thông tin kho thành công.");
         } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
@@ -123,7 +123,7 @@ public class InventoryController {
         }
         stockService.update(id, stockRequest);
         redirectAttributes.addFlashAttribute("successMsg",
-            "Stock updated successfully.");
+            "Cập nhật tồn kho thành công.");
         return "redirect:/inventory/stocks";
     }
 }

@@ -48,12 +48,12 @@ public class DrugService {
 
     public Drug getById(String id) {
         return drugRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Drug not found: " + id));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin thuốc: " + id));
     }
 
     public Drug create(DrugRequest request) {
         if (drugRepository.existsByRegistrationNumber(request.getRegistrationNumber())) {
-            throw new RuntimeException("Registration number already exists.");
+            throw new RuntimeException("Số đăng ký này đã tồn tại trong hệ thống.");
         }
 
         Category category = classifyFromRegistrationNumber(request.getRegistrationNumber());

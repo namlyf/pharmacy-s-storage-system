@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Warehouse Receipts')}"></head>
+<head th:replace="~{layout/base :: head('Phiếu nhập kho')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-receipt"></i> BM.04 Warehouse Receipts (Form C21)</h4>
+        <h4><i class="bi bi-receipt"></i> BM.04 Phiếu nhập kho (Mẫu C21-HD)</h4>
     </div>
 
     <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
@@ -17,13 +17,13 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Date</th>
-                        <th>Drug Name</th>
-                        <th>Lot No</th>
-                        <th>Qty</th>
-                        <th>Retail Price</th>
-                        <th>Entered By</th>
-                        <th>Actions</th>
+                        <th>Ngày nhập</th>
+                        <th>Tên thuốc</th>
+                        <th>Số lô</th>
+                        <th>Số lượng</th>
+                        <th>Giá bán (VAT)</th>
+                        <th>Người lập phiếu</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,17 +32,17 @@
                         <td th:text="${r.report.batch.drug.drugName}"></td>
                         <td><code th:text="${r.report.batch.lotNumber}"></code></td>
                         <td th:text="${r.report.batch.quantityReceived}"></td>
-                        <td><strong th:text="${#numbers.formatDecimal(r.retailPrice, 0, 'COMMA', 0, 'POINT') + ' VND'}"></strong></td>
+                        <td><strong th:text="${#numbers.formatDecimal(r.retailPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></strong></td>
                         <td th:text="${r.enteredBy.fullName}"></td>
                         <td>
                             <a th:href="@{/warehouse/receipts/view/{id}(id=${r.receiptID})}"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> View C21
+                                <i class="bi bi-eye"></i> Xem mẫu C21
                             </a>
                         </td>
                     </tr>
                     <tr th:if="${receipts.empty}">
-                        <td colspan="7" class="text-center py-4 text-muted">No warehouse receipts issued yet.</td>
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có phiếu nhập kho nào được lập.</td>
                     </tr>
                 </tbody>
             </table>

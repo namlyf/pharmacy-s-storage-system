@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Suppliers')}"></head>
+<head th:replace="~{layout/base :: head('Nhà cung cấp')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-building"></i> Supplier Registry</h4>
+        <h4><i class="bi bi-building"></i> Danh sách nhà cung cấp</h4>
         <a href="/suppliers/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Supplier
+            <i class="bi bi-plus-circle"></i> Thêm nhà cung cấp
         </a>
     </div>
 
@@ -23,13 +23,13 @@
                 <thead class="table-dark">
                     <tr>
                         <th>#</th>
-                        <th>Supplier Name</th>
-                        <th>License Number</th>
-                        <th>Tax Code</th>
-                        <th>Contact Person</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Tên nhà cung cấp</th>
+                        <th>Số ĐKKD</th>
+                        <th>Mã số thuế</th>
+                        <th>Người liên hệ</th>
+                        <th>Số điện thoại</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,9 +42,9 @@
                         <td th:text="${s.phone}"></td>
                         <td>
                             <span th:if="${s.active}"
-                                  class="badge bg-success">Active</span>
+                                  class="badge bg-success">Đang hoạt động</span>
                             <span th:unless="${s.active}"
-                                  class="badge bg-danger">Inactive</span>
+                                  class="badge bg-danger">Ngừng hoạt động</span>
                         </td>
                         <td>
                             <a th:href="@{/suppliers/edit/{id}(id=${s.supplierID})}"
@@ -55,7 +55,7 @@
                                   th:action="@{/suppliers/deactivate/{id}(id=${s.supplierID})}"
                                   method="post" style="display:inline;">
                                 <button class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Deactivate?')">
+                                        onclick="return confirm('Ngừng hoạt động?')">
                                     <i class="bi bi-x-circle"></i>
                                 </button>
                             </form>
@@ -63,7 +63,7 @@
                     </tr>
                     <tr th:if="${#lists.isEmpty(suppliers)}">
                         <td colspan="8" class="text-center text-muted py-4">
-                            No suppliers found.
+                            Không tìm thấy nhà cung cấp.
                         </td>
                     </tr>
                 </tbody>

@@ -37,18 +37,18 @@ public class WarehouseReceiptService {
     @Transactional
     public WarehouseReceipt create(WarehouseReceiptRequest request, String username) {
         if (receiptRepository.existsByReport_ReportID(request.getReportId())) {
-            throw new RuntimeException("Warehouse receipt already exists for this inspection report.");
+            throw new RuntimeException("Phiếu nhập kho đã tồn tại cho biên bản kiểm nhập này.");
         }
 
         InspectionReport report = reportRepository.findById(request.getReportId())
-            .orElseThrow(() -> new RuntimeException("Inspection report not found"));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản kiểm nhập"));
 
         if (!report.getStatus().name().equals("APPROVED")) {
-            throw new RuntimeException("Inspection report must be APPROVED before creating warehouse receipt.");
+            throw new RuntimeException("Biên bản kiểm nhập phải ở trạng thái ĐÃ PHÊ DUYỆT trước khi lập phiếu nhập kho.");
         }
 
         Account creator = accountRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
         BigDecimal importPrice = report.getVatPrice();
         BigDecimal profitRate = calculateProfitRate(importPrice);

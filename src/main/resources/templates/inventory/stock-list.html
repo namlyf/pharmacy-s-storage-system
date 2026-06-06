@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout/base :: head('Stock List')}"></head>
+<head th:replace="~{layout/base :: head('Danh sách tồn kho')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-box-seam"></i> All Stock</h4>
+        <h4><i class="bi bi-box-seam"></i> Tồn kho thực tế</h4>
         <a href="/inventory/stocks/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Stock Entry
+            <i class="bi bi-plus-circle"></i> Thêm bản ghi tồn kho
         </a>
     </div>
 
@@ -23,15 +23,15 @@
                 <thead class="table-dark">
                     <tr>
                         <th>#</th>
-                        <th>Drug Name</th>
-                        <th>Category</th>
-                        <th>Dosage Form</th>
-                        <th>Current Qty</th>
-                        <th>Min Threshold</th>
-                        <th>Storage Location</th>
-                        <th>Last Updated</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Tên thuốc</th>
+                        <th>Phân loại</th>
+                        <th>Dạng bào chế</th>
+                        <th>SL hiện tại</th>
+                        <th>Ngưỡng tối thiểu</th>
+                        <th>Vị trí kho</th>
+                        <th>Cập nhật lần cuối</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,9 +58,9 @@
                         </td>
                         <td>
                             <span th:if="${s.lowStock}"
-                                  class="badge bg-danger">Low Stock</span>
+                                  class="badge bg-danger">Sắp hết hàng</span>
                             <span th:unless="${s.lowStock}"
-                                  class="badge bg-success">OK</span>
+                                  class="badge bg-success">An toàn</span>
                         </td>
                         <td>
                             <a th:href="@{/inventory/stocks/edit/{id}(id=${s.stockID})}"
@@ -71,8 +71,8 @@
                     </tr>
                     <tr th:if="${#lists.isEmpty(stocks)}">
                         <td colspan="10" class="text-center text-muted py-4">
-                            No stock entries yet.
-                            <a href="/inventory/stocks/create">Add one now</a>
+                            Chưa có dữ liệu tồn kho.
+                            <a href="/inventory/stocks/create">Thêm mới ngay</a>
                         </td>
                     </tr>
                 </tbody>

@@ -29,25 +29,25 @@ public class InspectionReportService {
 
     public InspectionReport getById(String id) {
         return reportRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Inspection report not found: " + id));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản kiểm nhập: " + id));
     }
 
     public InspectionReport getByBatchId(String batchId) {
         return reportRepository.findByBatch_BatchID(batchId)
-            .orElseThrow(() -> new RuntimeException("Report not found for batch: " + batchId));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản cho lô hàng: " + batchId));
     }
 
     @Transactional
     public InspectionReport create(InspectionReportRequest request, String username) {
         if (reportRepository.existsByBatch_BatchID(request.getBatchId())) {
-            throw new RuntimeException("Inspection report already exists for this batch.");
+            throw new RuntimeException("Biên bản kiểm nhập đã tồn tại cho lô hàng này.");
         }
 
         DrugBatch batch = batchRepository.findById(request.getBatchId())
-            .orElseThrow(() -> new RuntimeException("Batch not found"));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy lô hàng"));
 
         Account inspector = accountRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
         // Auto-validations
         boolean sdkValid = validateSdk(batch.getDrug().getRegistrationNumber());

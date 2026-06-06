@@ -30,13 +30,13 @@ public class RequisitionService {
 
     public DrugRequisition getById(String id) {
         return requisitionRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Requisition not found: " + id));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy phiếu dự trù: " + id));
     }
 
     @Transactional
     public DrugRequisition create(RequisitionRequest request, String username) {
         Account creator = accountRepository.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found: " + username));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng: " + username));
 
         DrugRequisition requisition = DrugRequisition.builder()
             .createdBy(creator)

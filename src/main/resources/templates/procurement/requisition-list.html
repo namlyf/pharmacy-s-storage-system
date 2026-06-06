@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Procurement Forecast')}"></head>
+<head th:replace="~{layout/base :: head('Dự trù thuốc')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-file-earmark-text"></i> BM.01 Procurement Forecasts</h4>
+        <h4><i class="bi bi-file-earmark-text"></i> BM.01 Dự trù thuốc</h4>
         <a sec:authorize="hasAnyRole('PHARMACIST', 'WAREHOUSE_STAFF')"
            href="/purchase/requisitions/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create New Forecast
+            <i class="bi bi-plus-circle"></i> Tạo dự trù mới
         </a>
     </div>
 
@@ -22,11 +22,11 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Date</th>
-                        <th>Created By</th>
-                        <th>Status</th>
-                        <th>Items</th>
-                        <th>Actions</th>
+                        <th>Ngày tạo</th>
+                        <th>Người tạo</th>
+                        <th>Trạng thái</th>
+                        <th>Số mặt hàng</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,12 +44,12 @@
                         <td>
                             <a th:href="@{/purchase/requisitions/view/{id}(id=${r.requisitionID})}"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> View
+                                <i class="bi bi-eye"></i> Xem chi tiết
                             </a>
                         </td>
                     </tr>
                     <tr th:if="${requisitions.empty}">
-                        <td colspan="5" class="text-center py-4 text-muted">No procurement forecasts found.</td>
+                        <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy bản dự trù nào.</td>
                     </tr>
                 </tbody>
             </table>

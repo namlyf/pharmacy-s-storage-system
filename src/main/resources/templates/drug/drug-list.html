@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Drug List')}"></head>
+<head th:replace="~{layout/base :: head('Danh mục thuốc')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-capsule"></i> Drug Catalog</h4>
+        <h4><i class="bi bi-capsule"></i> Danh mục thuốc</h4>
         <a href="/drugs/create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Add Drug
+            <i class="bi bi-plus-circle"></i> Thêm thuốc
         </a>
     </div>
 
@@ -23,7 +23,7 @@
     <form method="get" action="/drugs" class="mb-3">
         <div class="input-group" style="max-width: 400px;">
             <input type="text" name="keyword" class="form-control"
-                   placeholder="Search drug name..."
+                   placeholder="Tìm tên thuốc..."
                    th:value="${keyword}">
             <button class="btn btn-outline-secondary" type="submit">
                 <i class="bi bi-search"></i>
@@ -38,14 +38,14 @@
                 <thead class="table-dark">
                     <tr>
                         <th>#</th>
-                        <th>Drug Name</th>
-                        <th>Active Ingredient</th>
-                        <th>Concentration</th>
-                        <th>Dosage Form</th>
-                        <th>Registration No.</th>
-                        <th>Category</th>
-                        <th>Status</th>
-                        <th>Actions</th>
+                        <th>Tên thuốc</th>
+                        <th>Hoạt chất</th>
+                        <th>Hàm lượng</th>
+                        <th>Dạng bào chế</th>
+                        <th>Số đăng ký</th>
+                        <th>Phân loại</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -65,8 +65,8 @@
                                   th:text="${drug.category}"></span>
                         </td>
                         <td>
-                            <span th:if="${drug.active}" class="badge bg-success">Active</span>
-                            <span th:unless="${drug.active}" class="badge bg-danger">Inactive</span>
+                            <span th:if="${drug.active}" class="badge bg-success">Đang hoạt động</span>
+                            <span th:unless="${drug.active}" class="badge bg-danger">Ngừng hoạt động</span>
                         </td>
                         <td>
                             <a th:href="@{/drugs/edit/{id}(id=${drug.drugID})}"
@@ -77,7 +77,7 @@
                                   th:action="@{/drugs/deactivate/{id}(id=${drug.drugID})}"
                                   method="post" style="display:inline;">
                                 <button class="btn btn-sm btn-outline-danger"
-                                        onclick="return confirm('Deactivate this drug?')">
+                                        onclick="return confirm('Ngừng hoạt động thuốc này?')">
                                     <i class="bi bi-x-circle"></i>
                                 </button>
                             </form>
@@ -92,7 +92,7 @@
                     </tr>
                     <tr th:if="${#lists.isEmpty(drugs)}">
                         <td colspan="9" class="text-center text-muted py-4">
-                            No drugs found.
+                            Không tìm thấy thuốc.
                         </td>
                     </tr>
                 </tbody>

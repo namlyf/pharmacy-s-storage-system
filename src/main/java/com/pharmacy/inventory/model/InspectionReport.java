@@ -7,6 +7,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "inspection_reports")
@@ -21,10 +23,6 @@ public class InspectionReport {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String reportID;
 
-    @OneToOne
-    @JoinColumn(name = "batch_id", nullable = false, unique = true)
-    private DrugBatch batch;
-
     @ManyToOne
     @JoinColumn(name = "inspected_by", nullable = false)
     private Account inspectedBy;
@@ -34,28 +32,11 @@ public class InspectionReport {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private ApprovalStatus status;
+
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private ApprovalStatus status = ApprovalStatus.PENDING;
-
-    @Column(nullable = false)
-    private boolean sdkValid;
-
-    @Column(nullable = false)
-    private boolean shelfLifeValid;
-
-    @Column(nullable = false)
-    private boolean invoiceValid;
-
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String visualQualityResult;
-
-    @Column(nullable = false)
-    private boolean storageConditionMatch;
-
-    private BigDecimal storageTemperature;
-
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal vatPrice;
+    private List<InspectionItem> items = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "approved_by")
@@ -65,4 +46,12 @@ public class InspectionReport {
 
     @Column(columnDefinition = "TEXT")
     private String rejectionReason;
+
+    @OneToOne(mappedBy = "report")
+    private WarehouseReceipt receipt;
+
+    public void addItem(InspectionItem item) {
+        items.add(item);
+        item.setReport(this);
+    }
 }

@@ -1,10 +1,12 @@
 package com.pharmacy.inventory.controller;
 
 import com.pharmacy.inventory.dto.request.DrugBatchRequest;
+import com.pharmacy.inventory.enums.ApprovalStatus;
 import com.pharmacy.inventory.model.Order;
 import com.pharmacy.inventory.model.OrderItem;
 import com.pharmacy.inventory.service.DrugBatchService;
 import com.pharmacy.inventory.service.OrderService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,10 +22,30 @@ public class DrugBatchController {
 
     private final DrugBatchService batchService;
     private final OrderService orderService;
+    private final com.pharmacy.inventory.repository.InspectionItemRepository inspectionItemRepository;
 
     @GetMapping
-    public String list(Model model) {
+    public String list(HttpSession session, Model model) {
         model.addAttribute("batches", batchService.getAll());
+
+        // 1. Lấy danh sách ID các lô đã có trong biên bản chính thức (database)
+        // Chỉ lấy những lô thuộc biên bản đang CHỜ DUYỆT hoặc ĐÃ DUYỆT.
+        // Nếu biên bản bị TỪ CHỐI, lô hàng sẽ biến mất khỏi danh sách này và hiện lại nút "Thêm vào biên bản".
+        java.util.List<String> inspectedBatchIds = inspectionItemRepository.findAll().stream()
+                .filter(item -> item.getReport().getStatus() == ApprovalStatus.PENDING || 
+                                item.getReport().getStatus() == ApprovalStatus.APPROVED)
+                .map(item -> item.getBatch().getBatchID())
+                .toList();
+        model.addAttribute("inspectedBatchIds", inspectedBatchIds);
+
+        // 2. Lấy danh sách ID các lô đang nằm trong "Giỏ hàng" chờ gửi (session)
+        java.util.List<com.pharmacy.inventory.dto.request.InspectionItemRequest> workingList = 
+            (java.util.List<com.pharmacy.inventory.dto.request.InspectionItemRequest>) session.getAttribute("workingList");
+        java.util.List<String> workingBatchIds = (workingList != null) 
+            ? workingList.stream().map(i -> i.getBatchId()).toList() 
+            : java.util.Collections.emptyList();
+        model.addAttribute("workingBatchIds", workingBatchIds);
+
         return "warehouse/batch-list";
     }
 

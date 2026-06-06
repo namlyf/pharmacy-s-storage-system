@@ -18,8 +18,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>Ngày lập</th>
-                        <th>Tên thuốc</th>
-                        <th>Số lô</th>
+                        <th>Danh sách thuốc (Lô)</th>
                         <th>Người kiểm nhập</th>
                         <th>Trạng thái</th>
                         <th>Thao tác</th>
@@ -28,8 +27,14 @@
                 <tbody>
                     <tr th:each="r : ${reports}">
                         <td th:text="${r.inspectionDate}"></td>
-                        <td th:text="${r.batch.drug.drugName}"></td>
-                        <td><code th:text="${r.batch.lotNumber}"></code></td>
+                        <td>
+                            <ul class="list-unstyled mb-0 small">
+                                <li th:each="item : ${r.items}">
+                                    <i class="bi bi-dot"></i> [[${item.batch.drug.drugName}]] 
+                                    (Lô: [[${item.batch.lotNumber}]])
+                                </li>
+                            </ul>
+                        </td>
                         <td th:text="${r.inspectedBy.fullName}"></td>
                         <td>
                             <span class="badge"
@@ -40,7 +45,7 @@
                         <td>
                             <a th:href="@{/inspection/reports/view/{id}(id=${r.reportID})}"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> Xem
+                                <i class="bi bi-eye"></i> Xem chi tiết
                             </a>
                         </td>
                     </tr>

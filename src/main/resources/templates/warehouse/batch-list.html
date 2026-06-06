@@ -36,12 +36,62 @@
                         <td th:text="${b.order.supplier.supplierName}"></td>
                         <td>
                             <div sec:authorize="hasRole('WAREHOUSE_STAFF')">
-                                <a th:href="@{/inspection/reports/create(batchId=${b.batchID})}" 
-                                   class="btn btn-sm btn-primary">
-                                    <i class="bi bi-clipboard-check"></i> Kiểm nhập
-                                </a>
+                                <!-- Trạng thái: Đã có trong biên bản chính thức -->
+                                <span th:if="${#lists.contains(inspectedBatchIds, b.batchID)}" class="badge bg-success">
+                                    <i class="bi bi-check-all"></i> Đã lập biên bản
+                                </span>
+
+                                <!-- Trạng thái: Đang nằm trong danh sách chờ gửi (Working List) -->
+                                <span th:if="${#lists.contains(workingBatchIds, b.batchID)}" class="badge bg-warning text-dark">
+                                    <i class="bi bi-hourglass-split"></i> Chờ gửi duyệt
+                                </span>
+
+                                <!-- Nút: Thêm vào biên bản (Chỉ hiện nếu chưa có ở cả 2 nơi trên) -->
+                                <button th:if="${!#lists.contains(inspectedBatchIds, b.batchID) && !#lists.contains(workingBatchIds, b.batchID)}"
+                                        type="button" class="btn btn-sm btn-primary" 
+                                        data-bs-toggle="modal" 
+                                        th:data-bs-target="'#inspectModal-' + ${b.batchID}">
+                                    <i class="bi bi-plus-circle"></i> Thêm vào biên bản
+                                </button>
+
+                                <!-- Modal nhập thông tin kiểm nhập (Giữ nguyên) -->
+                                <div th:if="${!#lists.contains(inspectedBatchIds, b.batchID) && !#lists.contains(workingBatchIds, b.batchID)}"
+                                     class="modal fade" th:id="'inspectModal-' + ${b.batchID}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <form th:action="@{/inspection/reports/add-to-list}" method="post">
+                                                <input type="hidden" name="batchId" th:value="${b.batchID}">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Kiểm nhập lô: [[${b.lotNumber}]]</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body text-start">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Giá nhập VAT (đơn vị nhỏ nhất)</label>
+                                                        <input type="number" name="vatPrice" class="form-control" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Kết quả cảm quan</label>
+                                                        <textarea name="visualQualityResult" class="form-control" rows="2" placeholder="Ví dụ: Bao bì nguyên vẹn, thuốc không đổi màu..."></textarea>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" name="invoiceValid" checked id="check1">
+                                                        <label class="form-check-label" for="check1">Hóa đơn hợp lệ</label>
+                                                    </div>
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="checkbox" name="storageConditionMatch" checked id="check2">
+                                                        <label class="form-check-label" for="check2">Điều kiện bảo quản khớp</label>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                    <button type="submit" class="btn btn-primary">Xác nhận thêm</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <span sec:authorize="!hasRole('WAREHOUSE_STAFF')" class="badge bg-info">ĐÃ ĐĂNG KÝ</span>
                         </td>
                     </tr>
                     <tr th:if="${batches.empty}">

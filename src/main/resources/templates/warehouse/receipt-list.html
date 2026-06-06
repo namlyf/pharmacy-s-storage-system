@@ -18,10 +18,8 @@
                 <thead class="table-light">
                     <tr>
                         <th>Ngày nhập</th>
-                        <th>Tên thuốc</th>
-                        <th>Số lô</th>
-                        <th>Số lượng</th>
-                        <th>Giá bán (VAT)</th>
+                        <th>Danh sách thuốc (Số lô)</th>
+                        <th>Tổng tiền phiếu</th>
                         <th>Người lập phiếu</th>
                         <th>Thao tác</th>
                     </tr>
@@ -29,20 +27,25 @@
                 <tbody>
                     <tr th:each="r : ${receipts}">
                         <td th:text="${r.receiptDate}"></td>
-                        <td th:text="${r.report.batch.drug.drugName}"></td>
-                        <td><code th:text="${r.report.batch.lotNumber}"></code></td>
-                        <td th:text="${r.report.batch.quantityReceived}"></td>
-                        <td><strong th:text="${#numbers.formatDecimal(r.retailPrice, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}"></strong></td>
+                        <td>
+                            <ul class="list-unstyled mb-0 small">
+                                <li th:each="item : ${r.report.items}">
+                                    <i class="bi bi-dot"></i> [[${item.batch.drug.drugName}]] 
+                                    (Lô: [[${item.batch.lotNumber}]])
+                                </li>
+                            </ul>
+                        </td>
+                        <td><strong th:text="${#numbers.formatDecimal(r.totalAmount, 0, 'COMMA', 0, 'POINT') + ' đ'}"></strong></td>
                         <td th:text="${r.enteredBy.fullName}"></td>
                         <td>
                             <a th:href="@{/warehouse/receipts/view/{id}(id=${r.receiptID})}"
                                class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> Xem mẫu C21
+                                <i class="bi bi-printer"></i> In mẫu C21
                             </a>
                         </td>
                     </tr>
                     <tr th:if="${receipts.empty}">
-                        <td colspan="7" class="text-center py-4 text-muted">Chưa có phiếu nhập kho nào được lập.</td>
+                        <td colspan="5" class="text-center py-4 text-muted">Chưa có phiếu nhập kho nào được lập.</td>
                     </tr>
                 </tbody>
             </table>

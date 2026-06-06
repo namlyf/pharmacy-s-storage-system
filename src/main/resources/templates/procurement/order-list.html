@@ -18,7 +18,8 @@
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Ngày đặt</th>
+                        <th>Mã dự trù</th>
+                        <th>Thời gian tạo</th>
                         <th>Nhà cung cấp</th>
                         <th>Người tạo</th>
                         <th>Trạng thái</th>
@@ -27,7 +28,15 @@
                 </thead>
                 <tbody>
                     <tr th:each="o : ${orders}">
-                        <td th:text="${o.orderDate}"></td>
+                        <td>
+                            <a th:href="@{/purchase/requisitions/view/{id}(id=${o.requisition.requisitionID})}"
+                               class="text-decoration-none fw-bold">
+                                <i class="bi bi-file-earmark-text"></i> [[${#strings.abbreviate(o.requisition.requisitionID, 8)}]]
+                            </a>
+                        </td>
+                        <td>
+                            <span th:text="${#temporals.format(o.createdAt, 'HH:mm dd/MM/yyyy')}"></span>
+                        </td>
                         <td th:text="${o.supplier.supplierName}"></td>
                         <td th:text="${o.createdBy.fullName}"></td>
                         <td>
@@ -42,10 +51,18 @@
                                class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-eye"></i> Xem chi tiết
                             </a>
+                            <form th:if="${o.status.name() == 'DRAFT'}"
+                                  th:action="@{/purchase/orders/delete/{id}(id=${o.orderID})}"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn hàng nháp này?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     <tr th:if="${orders.empty}">
-                        <td colspan="5" class="text-center py-4 text-muted">Không tìm thấy đơn đặt hàng nào.</td>
+                        <td colspan="6" class="text-center py-4 text-muted">Không tìm thấy đơn đặt hàng nào.</td>
                     </tr>
                 </tbody>
             </table>

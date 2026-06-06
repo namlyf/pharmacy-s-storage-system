@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,9 @@ public class Order {
 
     @Column(nullable = false)
     private LocalDate orderDate;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     private LocalDate expectedDeliveryDate;
 

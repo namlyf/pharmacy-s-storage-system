@@ -13,6 +13,7 @@
         .c21-header { font-size: 0.9rem; }
         .c21-title { text-align: center; margin: 20px 0; }
         .table-c21 th, .table-c21 td { font-size: 0.85rem; border: 1px solid #000 !important; }
+        .signature-box { height: 100px; }
     </style>
 </head>
 <body class="bg-light">
@@ -43,8 +44,8 @@
 
     <div class="row mb-3">
         <div class="col-12">
-            - Họ tên người giao hàng: <span th:text="${r.report.batch.order.supplier.supplierName}"></span><br>
-            - Theo hóa đơn số: <span th:text="${r.report.batch.invoiceNumber}"></span> ngày <span th:text="${r.report.batch.invoiceDate}"></span><br>
+            - Nhập theo biên bản kiểm nhập số: <span th:text="${r.report.reportID.substring(0,8)}"></span> ngày <span th:text="${r.report.inspectionDate}"></span><br>
+            - Nhà cung cấp: <span th:text="${r.report.items[0].batch.order.supplier.supplierName}"></span><br>
             - Nhập tại kho: Kho chính - Nhà thuốc bệnh viện
         </div>
     </div>
@@ -53,33 +54,33 @@
     <table class="table table-bordered table-c21 align-middle">
         <thead class="text-center bg-light">
             <tr>
-                <th rowspan="2">STT</th>
-                <th rowspan="2">Tên, nhãn hiệu, quy cách, phẩm chất vật tư</th>
-                <th rowspan="2">Mã số</th>
-                <th rowspan="2">ĐVT</th>
-                <th colspan="2">Số lượng</th>
-                <th rowspan="2">Đơn giá</th>
-                <th rowspan="2">Thành tiền</th>
-            </tr>
-            <tr>
-                <th>Yêu cầu</th>
-                <th>Thực nhập</th>
+                <th style="width: 40px;">STT</th>
+                <th style="width: 80px;">Mã số</th>
+                <th>Tên, nhãn hiệu, quy cách, phẩm chất vật tư</th>
+                <th style="width: 60px;">ĐVT</th>
+                <th style="width: 120px;">Hãng / Nước SX</th>
+                <th style="width: 100px;">Số lượng</th>
+                <th style="width: 100px;">Đơn giá (VAT)</th>
+                <th style="width: 110px;">Thành tiền</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class="text-center">1</td>
+            <tr th:each="item, iter : ${r.report.items}">
+                <td class="text-center" th:text="${iter.count}"></td>
+                <td class="text-center" th:text="${item.accountingCode}"></td>
                 <td>
-                    <strong th:text="${r.report.batch.drug.drugName}"></strong><br>
-                    <small th:text="${'Hàm lượng: ' + r.report.batch.drug.concentration}"></small><br>
-                    <small th:text="${'Số lô: ' + r.report.batch.lotNumber + ' - HSD: ' + r.report.batch.expirationDate}"></small>
+                    <strong th:text="${item.batch.drug.drugName}"></strong><br>
+                    <small th:text="${'Hàm lượng: ' + item.batch.drug.concentration}"></small><br>
+                    <small class="text-muted" th:text="${'Số lô: ' + item.batch.lotNumber + ' - HSD: ' + item.batch.expirationDate}"></small>
                 </td>
-                <td class="text-center" th:text="${r.accountingCode}"></td>
-                <td class="text-center" th:text="${r.report.batch.drug.unit}"></td>
-                <td class="text-center" th:text="${r.report.batch.quantityReceived}"></td>
-                <td class="text-center" th:text="${r.report.batch.quantityReceived}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(r.importPrice, 0, 'COMMA', 0, 'POINT')}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(r.totalAmount, 0, 'COMMA', 0, 'POINT')}"></td>
+                <td class="text-center" th:text="${item.batch.drug.unit}"></td>
+                <td class="text-center">
+                    <small th:text="${item.batch.drug.manufacturer}"></small><br>
+                    <small th:text="${item.batch.drug.countryOfOrigin}"></small>
+                </td>
+                <td class="text-center" th:text="${item.batch.quantityReceived}"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(item.vatPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                <td class="text-end" th:text="${#numbers.formatDecimal(new java.math.BigDecimal(item.vatPrice).multiply(new java.math.BigDecimal(item.batch.quantityReceived)), 0, 'COMMA', 0, 'POINT')}"></td>
             </tr>
         </tbody>
         <tfoot>
@@ -100,31 +101,25 @@
     <div class="row mt-5 text-center">
         <div class="col-3">
             <strong>Người lập phiếu</strong><br>
-            (Ký, họ tên)<br><br><br>
+            (Ký, họ tên)<br>
+            <div class="signature-box"></div>
             <span th:text="${r.enteredBy.fullName}"></span>
         </div>
         <div class="col-3">
             <strong>Người giao hàng</strong><br>
             (Ký, họ tên)
+            <div class="signature-box"></div>
         </div>
         <div class="col-3">
             <strong>Thủ kho</strong><br>
             (Ký, họ tên)
+            <div class="signature-box"></div>
         </div>
         <div class="col-3">
             <strong>Kế toán trưởng</strong><br>
             (Ký, họ tên)
+            <div class="signature-box"></div>
         </div>
-    </div>
-
-    <!-- Pricing (Internal Info - Not usually on C21 but helpful here) -->
-    <div class="mt-5 pt-5 border-top no-print">
-        <h6 class="text-muted">Thông tin niêm yết giá (Nghiệp vụ nội bộ)</h6>
-        <table class="table table-sm table-bordered w-50">
-            <tr><th class="bg-light">Tỷ lệ lãi (%)</th><td th:text="${r.profitRate + '%'}"></td></tr>
-            <tr><th class="bg-light">Giá bán lẻ (VAT)</th><td><strong class="text-primary" th:text="${#numbers.formatDecimal(r.retailPrice, 0, 'COMMA', 0, 'POINT') + ' VND'}"></strong></td></tr>
-            <tr th:if="${r.bhytPrice != null}"><th class="bg-light">Giá BHYT</th><td th:text="${#numbers.formatDecimal(r.bhytPrice, 0, 'COMMA', 0, 'POINT') + ' VND'}"></td></tr>
-        </table>
     </div>
 </div>
 

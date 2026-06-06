@@ -1,5 +1,6 @@
 package com.pharmacy.inventory.service;
 
+import com.pharmacy.inventory.dto.request.InspectionItemRequest;
 import com.pharmacy.inventory.dto.request.InspectionReportRequest;
 import com.pharmacy.inventory.enums.ApprovalStatus;
 import com.pharmacy.inventory.model.*;
@@ -32,40 +33,38 @@ public class InspectionReportService {
             .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản kiểm nhập: " + id));
     }
 
-    public InspectionReport getByBatchId(String batchId) {
-        return reportRepository.findByBatch_BatchID(batchId)
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản cho lô hàng: " + batchId));
-    }
-
     @Transactional
     public InspectionReport create(InspectionReportRequest request, String username) {
-        if (reportRepository.existsByBatch_BatchID(request.getBatchId())) {
-            throw new RuntimeException("Biên bản kiểm nhập đã tồn tại cho lô hàng này.");
-        }
-
-        DrugBatch batch = batchRepository.findById(request.getBatchId())
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy lô hàng"));
-
         Account inspector = accountRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-        // Auto-validations
-        boolean sdkValid = validateSdk(batch.getDrug().getRegistrationNumber());
-        boolean shelfLifeValid = validateShelfLife(batch.getExpirationDate(), request.getInspectionDate());
-
         InspectionReport report = InspectionReport.builder()
-            .batch(batch)
             .inspectedBy(inspector)
             .inspectionDate(request.getInspectionDate())
             .status(ApprovalStatus.PENDING)
-            .sdkValid(sdkValid)
-            .shelfLifeValid(shelfLifeValid)
-            .invoiceValid(request.isInvoiceValid())
-            .visualQualityResult(request.getVisualQualityResult())
-            .storageConditionMatch(request.isStorageConditionMatch())
-            .storageTemperature(request.getStorageTemperature())
-            .vatPrice(request.getVatPrice())
             .build();
+
+        for (InspectionItemRequest itemReq : request.getItems()) {
+            DrugBatch batch = batchRepository.findById(itemReq.getBatchId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lô hàng: " + itemReq.getBatchId()));
+
+            // Auto-validations
+            boolean sdkValid = validateSdk(batch.getDrug().getRegistrationNumber());
+            boolean shelfLifeValid = validateShelfLife(batch.getExpirationDate(), request.getInspectionDate());
+
+            InspectionItem item = InspectionItem.builder()
+                .batch(batch)
+                .sdkValid(sdkValid)
+                .shelfLifeValid(shelfLifeValid)
+                .invoiceValid(itemReq.isInvoiceValid())
+                .visualQualityResult(itemReq.getVisualQualityResult())
+                .storageConditionMatch(itemReq.isStorageConditionMatch())
+                .storageTemperature(itemReq.getStorageTemperature())
+                .vatPrice(itemReq.getVatPrice())
+                .build();
+
+            report.addItem(item);
+        }
 
         return reportRepository.save(report);
     }
@@ -92,6 +91,10 @@ public class InspectionReportService {
         report.setRejectionReason(reason);
         report.setApprovedBy(manager);
         report.setApprovedAt(LocalDateTime.now());
+        
+        // Note: Batches are released in the UI by filtering for batches NOT in an APPROVED/PENDING report.
+        // We could also explicitly flag them here if needed.
+        
         reportRepository.save(report);
     }
 

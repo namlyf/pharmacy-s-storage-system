@@ -20,7 +20,7 @@ public class ReceivingLogbook {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String logID;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "receipt_id", nullable = false)
     private WarehouseReceipt receipt;
 

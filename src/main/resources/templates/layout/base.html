@@ -55,6 +55,11 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="/warehouse/batches"><i class="bi bi-box-seam"></i> Quản lý lô</a></li>
+                        <li sec:authorize="hasRole('WAREHOUSE_STAFF')">
+                            <a class="dropdown-item" href="/inspection/reports/working-list">
+                                <i class="bi bi-list-stars"></i> Danh sách kiểm nhập
+                            </a>
+                        </li>
                         <li><a class="dropdown-item" href="/inspection/reports"><i class="bi bi-clipboard-check"></i> BM.03 Kiểm nhập</a></li>
                         <li><a class="dropdown-item" href="/warehouse/receipts"><i class="bi bi-receipt"></i> BM.04 Nhập kho</a></li>
                         <li><hr class="dropdown-divider"></li>

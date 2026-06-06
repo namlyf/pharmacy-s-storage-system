@@ -1,6 +1,7 @@
 package com.pharmacy.inventory.service;
 
 import com.pharmacy.inventory.dto.request.WarehouseReceiptRequest;
+import com.pharmacy.inventory.enums.ApprovalStatus;
 import com.pharmacy.inventory.model.*;
 import com.pharmacy.inventory.repository.AccountRepository;
 import com.pharmacy.inventory.repository.InspectionReportRepository;
@@ -21,6 +22,7 @@ public class WarehouseReceiptService {
 
     private final WarehouseReceiptRepository receiptRepository;
     private final InspectionReportRepository reportRepository;
+    private final com.pharmacy.inventory.repository.InspectionItemRepository itemRepository;
     private final AccountRepository accountRepository;
     private final InventoryStockService stockService;
     private final ReceivingLogbookRepository logbookRepository;
@@ -41,62 +43,74 @@ public class WarehouseReceiptService {
         }
 
         InspectionReport report = reportRepository.findById(request.getReportId())
-            .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản kiểm nhập"));
+            .orElseThrow(() -> new RuntimeException("Không tìm thấy biên bản kiểm nhập với mã: " + request.getReportId()));
 
-        if (!report.getStatus().name().equals("APPROVED")) {
+        if (report.getStatus() != ApprovalStatus.APPROVED) {
             throw new RuntimeException("Biên bản kiểm nhập phải ở trạng thái ĐÃ PHÊ DUYỆT trước khi lập phiếu nhập kho.");
         }
 
         Account creator = accountRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
-        BigDecimal importPrice = report.getVatPrice();
-        BigDecimal profitRate = calculateProfitRate(importPrice);
-        BigDecimal retailPrice = importPrice.multiply(BigDecimal.ONE.add(profitRate.divide(new BigDecimal("100"), 4, RoundingMode.HALF_UP)));
-        
-        retailPrice = retailPrice.setScale(0, RoundingMode.CEILING);
+        // Pre-calculate total and map request data
+        java.util.Map<String, com.pharmacy.inventory.dto.request.ReceiptItemData> requestDataMap = 
+            request.getItems().stream().collect(java.util.stream.Collectors.toMap(i -> i.getItemId(), i -> i));
 
-        BigDecimal totalAmount = importPrice.multiply(new BigDecimal(report.getBatch().getQuantityReceived()));
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (InspectionItem item : report.getItems()) {
+            BigDecimal itemTotal = new BigDecimal(item.getVatPrice()).multiply(new BigDecimal(item.getBatch().getQuantityReceived()));
+            totalAmount = totalAmount.add(itemTotal);
+            
+            // Map barcode and accounting code from request
+            var data = requestDataMap.get(item.getItemID());
+            if (data != null) {
+                item.setBarcode(data.getBarcode());
+                item.setAccountingCode(data.getAccountingCode());
+            }
+        }
 
         WarehouseReceipt receipt = WarehouseReceipt.builder()
             .report(report)
             .enteredBy(creator)
             .receiptDate(request.getReceiptDate())
-            .barcode(request.getBarcode())
-            .accountingCode(request.getAccountingCode())
-            .importPrice(importPrice)
             .totalAmount(totalAmount)
-            .bhytPrice(request.getBhytPrice())
-            .profitRate(profitRate)
-            .retailPrice(retailPrice)
+            .profitRate(BigDecimal.ZERO)
+            .retailPrice(BigDecimal.ZERO)
+            .importPrice(BigDecimal.ZERO)
             .createdAt(LocalDateTime.now())
             .build();
 
         WarehouseReceipt savedReceipt = receiptRepository.save(receipt);
 
-        // Update Inventory Stock
-        stockService.increaseStock(report.getBatch().getDrug().getDrugID(), report.getBatch().getQuantityReceived());
+        // Process each item: update stock and create logbook entry
+        for (InspectionItem item : report.getItems()) {
+            BigDecimal importPrice = new BigDecimal(item.getVatPrice());
+            BigDecimal itemTotalAmount = importPrice.multiply(new BigDecimal(item.getBatch().getQuantityReceived()));
+            
+            // Update Inventory Stock
+            stockService.increaseStock(item.getBatch().getDrug().getDrugID(), item.getBatch().getQuantityReceived());
 
-        // CREATE LOGBOOK ENTRY
-        ReceivingLogbook log = ReceivingLogbook.builder()
-            .receipt(savedReceipt)
-            .logDate(savedReceipt.getReceiptDate())
-            .invoiceNumber(report.getBatch().getInvoiceNumber())
-            .supplier(report.getBatch().getOrder().getSupplier())
-            .drug(report.getBatch().getDrug())
-            .drugNameSnapshot(report.getBatch().getDrug().getDrugName())
-            .concentrationSnapshot(report.getBatch().getDrug().getConcentration())
-            .unit(report.getBatch().getDrug().getUnit())
-            .quantity(report.getBatch().getQuantityReceived())
-            .lotNumber(report.getBatch().getLotNumber())
-            .expirationDate(report.getBatch().getExpirationDate())
-            .unitPriceVAT(importPrice)
-            .totalAmount(totalAmount)
-            .enteredBy(creator)
-            .createdAt(LocalDateTime.now())
-            .build();
-        
-        logbookRepository.save(log);
+            // CREATE LOGBOOK ENTRY (BM.05)
+            ReceivingLogbook log = ReceivingLogbook.builder()
+                .receipt(savedReceipt)
+                .logDate(savedReceipt.getReceiptDate())
+                .invoiceNumber(item.getBatch().getInvoiceNumber())
+                .supplier(item.getBatch().getOrder().getSupplier())
+                .drug(item.getBatch().getDrug())
+                .drugNameSnapshot(item.getBatch().getDrug().getDrugName())
+                .concentrationSnapshot(item.getBatch().getDrug().getConcentration())
+                .unit(item.getBatch().getDrug().getUnit())
+                .quantity(item.getBatch().getQuantityReceived())
+                .lotNumber(item.getBatch().getLotNumber())
+                .expirationDate(item.getBatch().getExpirationDate())
+                .unitPriceVAT(importPrice)
+                .totalAmount(itemTotalAmount)
+                .enteredBy(creator)
+                .createdAt(LocalDateTime.now())
+                .build();
+            
+            logbookRepository.save(log);
+        }
 
         return savedReceipt;
     }

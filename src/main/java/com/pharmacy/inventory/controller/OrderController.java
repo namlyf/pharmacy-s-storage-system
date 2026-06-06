@@ -16,6 +16,7 @@ import java.security.Principal;
 public class OrderController {
 
     private final OrderService orderService;
+    private final com.pharmacy.inventory.repository.DrugBatchRepository batchRepository;
 
     @GetMapping
     public String list(Model model) {
@@ -41,6 +42,13 @@ public class OrderController {
     public String view(@PathVariable String id, Model model) {
         Order order = orderService.getById(id);
         model.addAttribute("order", order);
+        
+        // Tìm danh sách thuốc đã được đăng ký lô hàng cho đơn này
+        java.util.List<String> registeredDrugIds = batchRepository.findByOrder_OrderID(id).stream()
+                .map(batch -> batch.getDrug().getDrugID())
+                .toList();
+        model.addAttribute("registeredDrugIds", registeredDrugIds);
+        
         return "procurement/order-view";
     }
 
@@ -53,5 +61,16 @@ public class OrderController {
             redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
         }
         return "redirect:/purchase/orders/view/" + id;
+    }
+
+    @PostMapping("/delete/{id}")
+    public String deleteOrder(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        try {
+            orderService.deleteOrder(id);
+            redirectAttributes.addFlashAttribute("successMsg", "Đã xóa đơn hàng thành công.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/purchase/orders";
     }
 }

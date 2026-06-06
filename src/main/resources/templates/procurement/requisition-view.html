@@ -1,143 +1,145 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Chi tiết dự trù')}"></head>
-<body>
-<div th:replace="~{layout/base :: navbar}"></div>
+<head>
+    <meta charset="UTF-8">
+    <title>Bản dự trù BM.01 – Pharmacy System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+            body { background: white !important; }
+        }
+        .form-header { font-size: 0.9rem; }
+        .form-title { text-align: center; margin: 20px 0; }
+        .table-report th, .table-report td { font-size: 0.85rem; border: 1px solid #000 !important; }
+        .signature-box { height: 100px; }
+        .btn-xs { padding: 1px 5px; font-size: 0.75rem; }
+    </style>
+</head>
+<body class="bg-light">
 
-<div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/purchase/requisitions">Dự trù & Đặt hàng</a></li>
-            <li class="breadcrumb-item active">Chi tiết dự trù</li>
-        </ol>
-    </nav>
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-file-earmark-text"></i> Chi tiết bản dự trù</h4>
-        <div class="d-flex align-items-center gap-3">
-            <div th:if="${(req.overallStatus.name() == 'APPROVED' || req.overallStatus.name() == 'PARTIALLY_APPROVED')}" 
-                 sec:authorize="hasRole('PHARMACIST')">
-                <form th:action="@{/purchase/orders/generate/{id}(id=${req.requisitionID})}" method="post">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-cart-plus"></i> Tạo đơn đặt hàng
-                    </button>
-                </form>
-            </div>
-            <span class="badge p-2 fs-6"
-                  th:classappend="${req.overallStatus.name() == 'APPROVED' ? 'bg-success' : 
-                                 (req.overallStatus.name() == 'PENDING' ? 'bg-warning' : 
-                                 (req.overallStatus.name() == 'REJECTED' ? 'bg-danger' : 'bg-info'))}"
-                  th:text="${req.overallStatus}"></span>
+<div class="container bg-white my-4 p-5 shadow-sm">
+    <!-- Interactive Management Bar (Hidden when printing) -->
+    <div class="no-print mb-4 d-flex justify-content-between align-items-center bg-light p-3 rounded border">
+        <div>
+            <a href="/purchase/requisitions" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Quay lại</a>
+            <button onclick="window.print()" class="btn btn-dark btn-sm ms-2"><i class="bi bi-printer"></i> In bản dự trù (BM.01)</button>
         </div>
-    </div>
-    <hr>
-
-    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
-    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
-
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <table class="table table-sm">
-                <tr>
-                    <th style="width: 40%;">Người tạo:</th>
-                    <td th:text="${req.createdBy.fullName}"></td>
-                </tr>
-                <tr>
-                    <th>Ngày tạo:</th>
-                    <td th:text="${req.createdDate}"></td>
-                </tr>
-            </table>
-        </div>
-        <div class="col-md-6">
-            <div class="card bg-light">
-                <div class="card-body py-2">
-                    <small class="text-muted d-block">Ghi chú:</small>
-                    <span th:text="${req.notes != null && !req.notes.empty ? req.notes : 'Không có ghi chú.'}"></span>
-                </div>
-            </div>
+        <div th:if="${(req.overallStatus.name() == 'APPROVED' || req.overallStatus.name() == 'PARTIALLY_APPROVED')}" 
+             sec:authorize="hasRole('PHARMACIST')">
+            <form th:action="@{/purchase/orders/generate/{id}(id=${req.requisitionID})}" method="post">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-cart-plus"></i> TẠO ĐƠN ĐẶT HÀNG
+                </button>
+            </form>
         </div>
     </div>
 
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-white fw-bold">Danh mục hàng hóa dự trù</div>
-        <div class="card-body p-0">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Tên thuốc</th>
-                        <th>Số lượng</th>
-                        <th>Nhà cung cấp dự kiến</th>
-                        <th>Lý do</th>
-                        <th>Trạng thái</th>
-                        <th sec:authorize="hasRole('MANAGER')" class="text-center">Phê duyệt</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="item : ${req.items}">
-                        <td>
-                            <strong th:text="${item.drug.drugName}"></strong><br>
-                            <small class="text-muted" th:text="${item.drug.activeIngredient}"></small>
-                        </td>
-                        <td th:text="${item.quantity + ' ' + item.unit}"></td>
-                        <td th:text="${item.preferredSupplier != null ? item.preferredSupplier.supplierName : '-'}"></td>
-                        <td th:text="${item.reason}"></td>
-                        <td>
-                            <span class="badge"
-                                  th:classappend="${item.approvalStatus.name() == 'APPROVED' ? 'bg-success' : 
-                                                 (item.approvalStatus.name() == 'REJECTED' ? 'bg-danger' : 'bg-warning')}"
-                                  th:text="${item.approvalStatus}"></span>
-                            <div th:if="${item.approvalStatus.name() == 'REJECTED'}" class="small text-danger mt-1">
-                                <i class="bi bi-x-circle"></i> [[${item.rejectionReason}]]
-                            </div>
-                        </td>
-                        <td sec:authorize="hasRole('MANAGER')" class="text-center">
-                            <div th:if="${item.approvalStatus.name() == 'PENDING'}" class="d-flex justify-content-center gap-2">
-                                <form th:action="@{/purchase/requisitions/item/approve/{id}(id=${item.itemID})}" method="post">
-                                    <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
-                                    <button type="submit" class="btn btn-sm btn-success">
-                                        <i class="bi bi-check-lg"></i> Duyệt
-                                    </button>
-                                </form>
-                                <button type="button" class="btn btn-sm btn-danger" 
-                                        data-bs-toggle="modal" 
-                                        th:data-bs-target="'#rejectModal-' + ${item.itemID}">
-                                    <i class="bi bi-x-lg"></i> Từ chối
-                                </button>
+    <!-- Header Section (BM.01 Layout) -->
+    <div class="row form-header">
+        <div class="col-6">
+            <strong>BỆNH VIỆN ĐẠI HỌC Y HÀ NỘI</strong><br>
+            <strong>KHOA DƯỢC</strong>
+        </div>
+        <div class="col-6 text-end">
+            <strong>Mẫu số: BM.01.D.01</strong><br>
+            Số: <span th:text="${req.requisitionID.substring(0,8)}"></span>
+        </div>
+    </div>
 
-                                <!-- Reject Modal -->
-                                <div class="modal fade" th:id="'rejectModal-' + ${item.itemID}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <form th:action="@{/purchase/requisitions/item/reject/{id}(id=${item.itemID})}" method="post">
-                                                <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Từ chối mặt hàng</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body text-start">
-                                                    <p>Bạn có chắc chắn muốn từ chối <strong>[[${item.drug.drugName}]]</strong>?</p>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Lý do từ chối</label>
-                                                        <textarea name="rejectionReason" class="form-control" required rows="3"></textarea>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                                    <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
-                                                </div>
-                                            </form>
+    <div class="form-title">
+        <h4 class="fw-bold">DỰ TRÙ THUỐC / HÓA CHẤT / VẬT TƯ</h4>
+        <p>Ngày lập: <span th:text="${#temporals.format(req.createdDate, 'dd/MM/yyyy')}"></span></p>
+    </div>
+
+    <!-- Main Table -->
+    <table class="table table-bordered table-report align-middle">
+        <thead class="text-center bg-light">
+            <tr>
+                <th style="width: 40px;">STT</th>
+                <th>Tên thuốc, nồng độ, hàm lượng</th>
+                <th style="width: 70px;">ĐVT</th>
+                <th style="width: 90px;">Quy cách</th>
+                <th style="width: 80px;">Số lượng</th>
+                <th>Nhà cung cấp dự kiến</th>
+                <th class="no-print" style="width: 110px;">Trạng thái</th>
+                <th class="no-print" sec:authorize="hasRole('MANAGER')" style="width: 160px;">Thao tác duyệt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item, iter : ${req.items}">
+                <td class="text-center" th:text="${iter.count}"></td>
+                <td>
+                    <strong th:text="${item.drug.drugName}"></strong><br>
+                    <small th:text="${item.drug.activeIngredient}"></small>
+                </td>
+                <td class="text-center" th:text="${item.unit}"></td>
+                <td class="text-center" th:text="${item.packagingSpec}"></td>
+                <td class="text-center" th:text="${item.quantity}"></td>
+                <td th:text="${item.preferredSupplier != null ? item.preferredSupplier.supplierName : '-'}"></td>
+                <td class="no-print text-center">
+                    <span class="badge" th:classappend="${item.approvalStatus.name() == 'APPROVED' ? 'bg-success' : (item.approvalStatus.name() == 'REJECTED' ? 'bg-danger' : 'bg-warning')}"
+                          th:text="${item.approvalStatus}"></span>
+                </td>
+                <td class="no-print" sec:authorize="hasRole('MANAGER')">
+                    <div th:if="${item.approvalStatus.name() == 'PENDING'}" class="d-flex justify-content-center gap-1">
+                        <form th:action="@{/purchase/requisitions/item/approve/{id}(id=${item.itemID})}" method="post">
+                            <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
+                            <button type="submit" class="btn btn-xs btn-success">Duyệt</button>
+                        </form>
+                        <button type="button" class="btn btn-xs btn-danger" 
+                                data-bs-toggle="modal" th:data-bs-target="'#rejectModal-' + ${item.itemID}">Từ chối</button>
+                        
+                        <!-- Reject Modal -->
+                        <div class="modal fade" th:id="'rejectModal-' + ${item.itemID}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content text-start">
+                                    <form th:action="@{/purchase/requisitions/item/reject/{id}(id=${item.itemID})}" method="post">
+                                        <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
+                                        <div class="modal-header"><h5>Lý do từ chối</h5></div>
+                                        <div class="modal-body">
+                                            <textarea name="rejectionReason" class="form-control" required rows="3" placeholder="Nhập lý do..."></textarea>
                                         </div>
-                                    </div>
+                                        <div class="modal-footer"><button type="submit" class="btn btn-danger btn-sm">Xác nhận</button></div>
+                                    </form>
                                 </div>
                             </div>
-                            <span th:unless="${item.approvalStatus.name() == 'PENDING'}" class="text-muted small">
-                                Xử lý bởi [[${item.approvedBy.fullName}]]
-                            </span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                    <small th:unless="${item.approvalStatus.name() == 'PENDING'}" class="text-muted">
+                        [[${item.approvedBy != null ? item.approvedBy.fullName : '-'}]]
+                    </small>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            - Ghi chú chung: <span th:text="${req.notes}"></span>
+        </div>
+    </div>
+
+    <!-- Signatures -->
+    <div class="row mt-5 text-center">
+        <div class="col-4">
+            <strong>Người dự trù</strong><br>
+            (Ký, họ tên)<br>
+            <div class="signature-box"></div>
+            <span th:text="${req.createdBy.fullName}"></span>
+        </div>
+        <div class="col-4">
+            <strong>Trưởng khoa/Tổ trưởng</strong><br>
+            (Ký, họ tên)
+            <div class="signature-box"></div>
+        </div>
+        <div class="col-4">
+            <strong>Lãnh đạo phê duyệt</strong><br>
+            (Ký, họ tên)
+            <div class="signature-box"></div>
         </div>
     </div>
 </div>

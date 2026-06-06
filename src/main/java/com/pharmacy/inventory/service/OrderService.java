@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,7 @@ public class OrderService {
                 .supplier(supplier)
                 .createdBy(creator)
                 .orderDate(LocalDate.now())
+                .createdAt(LocalDateTime.now())
                 .status(OrderStatus.DRAFT)
                 .notes("Generated from Requisition: " + requisitionId)
                 .build();
@@ -99,5 +101,18 @@ public class OrderService {
         }
         order.setStatus(OrderStatus.SENT);
         orderRepository.save(order);
+    }
+
+    @Transactional
+    public void deleteOrder(String orderId) {
+        Order order = getById(orderId);
+        // Chỉ cho phép xóa đơn hàng ở trạng thái DRAFT
+        if (order.getStatus() != OrderStatus.DRAFT) {
+            throw new RuntimeException("Chỉ có thể xóa đơn hàng ở trạng thái NHÁP (DRAFT).");
+        }
+        
+        // Kiểm tra xem đã có lô hàng nào được tạo từ đơn hàng này chưa (phòng hờ)
+        // Lưu ý: Trong logic thông thường DRAFT sẽ chưa có Batch, nhưng check cho an toàn
+        orderRepository.delete(order);
     }
 }

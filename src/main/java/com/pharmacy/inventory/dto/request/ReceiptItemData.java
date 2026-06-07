@@ -12,3 +12,8 @@ public class ReceiptItemData {
     private String barcode;
     private String accountingCode;
 }
+
+
+
+
+

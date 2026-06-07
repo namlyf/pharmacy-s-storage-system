@@ -72,3 +72,7 @@ public class DrugRequest {
     public Integer getMinimumThreshold() { return minimumThreshold; }
     public void setMinimumThreshold(Integer minimumThreshold) { this.minimumThreshold = minimumThreshold; }
 }
+
+
+
+

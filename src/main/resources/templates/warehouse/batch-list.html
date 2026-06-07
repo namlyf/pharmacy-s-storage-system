@@ -37,30 +37,30 @@
                         <td>
                             <div sec:authorize="hasRole('WAREHOUSE_STAFF')">
                                 <!-- Trạng thái: Đã có trong biên bản chính thức -->
-                                <span th:if="${#lists.contains(inspectedBatchIds, b.batchID)}" class="badge bg-success">
+                                <span th:if="${#lists.contains(inspectedBatchIds, b.batchId)}" class="badge bg-success">
                                     <i class="bi bi-check-all"></i> Đã lập biên bản
                                 </span>
 
                                 <!-- Trạng thái: Đang nằm trong danh sách chờ gửi (Working List) -->
-                                <span th:if="${#lists.contains(workingBatchIds, b.batchID)}" class="badge bg-warning text-dark">
+                                <span th:if="${#lists.contains(workingBatchIds, b.batchId)}" class="badge bg-warning text-dark">
                                     <i class="bi bi-hourglass-split"></i> Chờ gửi duyệt
                                 </span>
 
                                 <!-- Nút: Thêm vào biên bản (Chỉ hiện nếu chưa có ở cả 2 nơi trên) -->
-                                <button th:if="${!#lists.contains(inspectedBatchIds, b.batchID) && !#lists.contains(workingBatchIds, b.batchID)}"
+                                <button th:if="${!#lists.contains(inspectedBatchIds, b.batchId) && !#lists.contains(workingBatchIds, b.batchId)}"
                                         type="button" class="btn btn-sm btn-primary" 
                                         data-bs-toggle="modal" 
-                                        th:data-bs-target="'#inspectModal-' + ${b.batchID}">
+                                        th:data-bs-target="'#inspectModal-' + ${b.batchId}">
                                     <i class="bi bi-plus-circle"></i> Thêm vào biên bản
                                 </button>
 
                                 <!-- Modal nhập thông tin kiểm nhập (Giữ nguyên) -->
-                                <div th:if="${!#lists.contains(inspectedBatchIds, b.batchID) && !#lists.contains(workingBatchIds, b.batchID)}"
-                                     class="modal fade" th:id="'inspectModal-' + ${b.batchID}" tabindex="-1">
+                                <div th:if="${!#lists.contains(inspectedBatchIds, b.batchId) && !#lists.contains(workingBatchIds, b.batchId)}"
+                                     class="modal fade" th:id="'inspectModal-' + ${b.batchId}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <form th:action="@{/inspection/reports/add-to-list}" method="post">
-                                                <input type="hidden" name="batchId" th:value="${b.batchID}">
+                                                <input type="hidden" name="batchId" th:value="${b.batchId}">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title">Kiểm nhập lô: [[${b.lotNumber}]]</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -106,3 +106,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+

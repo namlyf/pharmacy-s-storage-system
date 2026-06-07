@@ -65,3 +65,8 @@ public class WarehouseReceiptController {
         return "warehouse/receipt-view";
     }
 }
+
+
+
+
+

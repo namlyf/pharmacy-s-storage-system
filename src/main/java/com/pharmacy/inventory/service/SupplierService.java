@@ -17,7 +17,7 @@ public class SupplierService {
     }
 
     public List<Supplier> getAllActive() {
-        return supplierRepository.findByIsActiveTrue();
+        return supplierRepository.findByactiveTrue();
     }
 
     public List<Supplier> getAll() {
@@ -57,7 +57,7 @@ public class SupplierService {
         supplier.setContactPerson(request.getContactPerson());
         supplier.setPhone(request.getPhone());
         supplier.setEmail(request.getEmail());
-        supplier.setActive(request.getIsActive());
+        supplier.setActive(request.isActive());
 
         return supplierRepository.save(supplier);
     }
@@ -68,3 +68,7 @@ public class SupplierService {
         supplierRepository.save(supplier);
     }
 }
+
+
+
+

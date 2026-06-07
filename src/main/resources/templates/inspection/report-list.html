@@ -43,7 +43,7 @@
                                   th:text="${r.status.name() == 'APPROVED' ? 'Đã phê duyệt' : (r.status.name() == 'PENDING' ? 'Chờ duyệt' : 'Từ chối')}"></span>
                         </td>
                         <td>
-                            <a th:href="@{/inspection/reports/view/{id}(id=${r.reportID})}"
+                            <a th:href="@{/inspection/reports/view/{id}(id=${r.reportId})}"
                                class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-eye"></i> Xem chi tiết
                             </a>
@@ -61,3 +61,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+

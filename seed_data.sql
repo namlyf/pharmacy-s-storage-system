@@ -4,14 +4,14 @@
 USE pharmacy_db;
 
 -- 1. Seed Accounts (Only if username doesn't exist)
-INSERT IGNORE INTO accounts (userid, username, password, full_name, role, is_active, created_at)
+INSERT IGNORE INTO accounts (user_id, username, password, full_name, role, active, created_at)
 VALUES 
 (UUID(), 'manager', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOn2', 'Nguyen Lan Hieu', 'MANAGER', 1, NOW()),
 (UUID(), 'pharmacist', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOn2', 'Can Khanh Linh', 'PHARMACIST', 1, NOW()),
 (UUID(), 'warehouse', '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.TVuHOn2', 'Nguyen Thi Hong Hanh', 'WAREHOUSE_STAFF', 1, NOW());
 
 -- 2. Seed Suppliers (Only if license_number doesn't exist)
-INSERT IGNORE INTO suppliers (supplierid, supplier_name, license_number, tax_code, address, contact_person, phone, email, is_active)
+INSERT IGNORE INTO suppliers (supplier_id, supplier_name, license_number, tax_code, address, contact_person, phone, email, active)
 VALUES 
 (UUID(), 'Cong ty Co phan Duoc pham TW1 (CPC1)', 'GPP-123/CPC1', '0100108318', '87 Nguyen Huy Tuong, Thanh Xuan, Ha Noi', 'Nguyen Van A', '024.38544158', 'contact@cpc1.com', 1),
 (UUID(), 'Cong ty TNHH San xuat Duoc pham Medlac', 'GMP-456/MED', '0102693245', 'KCN Cong nghe cao Hoa Lac, Ha Noi', 'Tran Thi B', '024.33940123', 'info@medlac.com.vn', 1),
@@ -41,9 +41,9 @@ BEGIN
     DECLARE new_drug_id VARCHAR(255);
     IF NOT EXISTS (SELECT 1 FROM drugs WHERE registration_number = d_reg) THEN
         SET new_drug_id = UUID();
-        INSERT INTO drugs (drugid, drug_name, active_ingredient, concentration, dosage_form, registration_number, category, manufacturer, country_of_origin, unit, packaging_spec, storage_condition, is_active)
-        VALUES (new_drug_id, d_name, d_ingredient, d_conc, d_form, d_reg, d_cat, d_manu, d_origin, d_unit, d_spec, d_storage, 1);
-        INSERT INTO inventory_stocks (stockid, drug_id, current_quantity, minimum_threshold, storage_location, last_updated)
+        INSERT INTO drugs (drug_id, drug_name, status_ingredient, concentration, dosage_form, registration_number, category, manufacturer, country_of_origin, unit, packaging_spec, storage_condition, status)
+        VALUES (new_drug_id, d_name, d_ingredient, d_conc, d_form, d_reg, d_cat, d_manu, d_origin, d_unit, d_spec, d_storage, 'ACTIVE');
+        INSERT INTO inventory_stocks (stock_id, drug_id, current_quantity, minimum_threshold, storage_location, last_updated)
         VALUES (UUID(), new_drug_id, s_qty, s_min, s_loc, NOW());
     END IF;
 END //

@@ -16,7 +16,7 @@ public class InspectionItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String itemID;
+    private String itemId;
 
     @ManyToOne
     @JoinColumn(name = "report_id", nullable = false)
@@ -52,3 +52,8 @@ public class InspectionItem {
     @Column(length = 50)
     private String accountingCode;
 }
+
+
+
+
+

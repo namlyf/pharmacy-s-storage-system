@@ -33,3 +33,7 @@ public class InventoryStockRequest {
     public String getStorageLocation() { return storageLocation; }
     public void setStorageLocation(String storageLocation) { this.storageLocation = storageLocation; }
 }
+
+
+
+

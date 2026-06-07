@@ -39,7 +39,7 @@ public class DrugService {
 
     // ── CRUD ─────────────────────────────────────────────
     public List<Drug> getAllActive() {
-        return drugRepository.findByIsActiveTrue();
+        return drugRepository.findByStatus(com.pharmacy.inventory.enums.DrugStatus.ACTIVE);
     }
 
     public List<Drug> getAll() {
@@ -70,6 +70,7 @@ public class DrugService {
             .unit(request.getUnit())
             .packagingSpec(request.getPackagingSpec())
             .storageCondition(request.getStorageCondition())
+            .status(com.pharmacy.inventory.enums.DrugStatus.DRAFT)
             .build();
 
         Drug savedDrug = drugRepository.save(drug);
@@ -100,13 +101,13 @@ public class DrugService {
 
     public void deactivate(String id) {
         Drug drug = getById(id);
-        drug.setActive(false);
+        drug.setStatus(com.pharmacy.inventory.enums.DrugStatus.INACTIVE);
         drugRepository.save(drug);
     }
 
     public void activate(String id) {
         Drug drug = getById(id);
-        drug.setActive(true);
+        drug.setStatus(com.pharmacy.inventory.enums.DrugStatus.ACTIVE);
         drugRepository.save(drug);
     }
 
@@ -114,3 +115,7 @@ public class DrugService {
         return drugRepository.findByDrugNameContainingIgnoreCase(keyword);
     }
 }
+
+
+
+

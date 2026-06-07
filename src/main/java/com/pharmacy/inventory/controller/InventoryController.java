@@ -98,7 +98,7 @@ public class InventoryController {
         InventoryStock stock = stockService.getById(id);
 
         InventoryStockRequest request = new InventoryStockRequest();
-        request.setDrugId(stock.getDrug().getDrugID());
+        request.setDrugId(stock.getDrug().getDrugId());
         request.setCurrentQuantity(stock.getCurrentQuantity());
         request.setMinimumThreshold(stock.getMinimumThreshold());
         request.setStorageLocation(stock.getStorageLocation());
@@ -127,3 +127,8 @@ public class InventoryController {
         return "redirect:/inventory/stocks";
     }
 }
+
+
+
+
+

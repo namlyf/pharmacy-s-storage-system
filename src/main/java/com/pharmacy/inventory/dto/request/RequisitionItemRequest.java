@@ -8,6 +8,11 @@ public class RequisitionItemRequest {
     private Integer quantity;
     private String unit;
     private String packagingSpec;
-    private String preferredSupplierId;
+    private String preferredsupplierId;
     private String reason;
 }
+
+
+
+
+

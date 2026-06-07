@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "`orders`")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String orderID;
+    private String orderId;
 
     @ManyToOne
     @JoinColumn(name = "requisition_id")
@@ -58,3 +58,8 @@ public class Order {
         item.setOrder(this);
     }
 }
+
+
+
+
+

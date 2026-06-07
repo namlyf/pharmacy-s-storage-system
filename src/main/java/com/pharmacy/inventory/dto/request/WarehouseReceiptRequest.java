@@ -15,3 +15,8 @@ public class WarehouseReceiptRequest {
     private LocalDate receiptDate;
     private List<ReceiptItemData> items = new ArrayList<>();
 }
+
+
+
+
+

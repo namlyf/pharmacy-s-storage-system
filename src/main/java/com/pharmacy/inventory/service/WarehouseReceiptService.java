@@ -38,7 +38,7 @@ public class WarehouseReceiptService {
 
     @Transactional
     public WarehouseReceipt create(WarehouseReceiptRequest request, String username) {
-        if (receiptRepository.existsByReport_ReportID(request.getReportId())) {
+        if (receiptRepository.existsByReport_ReportId(request.getReportId())) {
             throw new RuntimeException("Phiếu nhập kho đã tồn tại cho biên bản kiểm nhập này.");
         }
 
@@ -62,7 +62,7 @@ public class WarehouseReceiptService {
             totalAmount = totalAmount.add(itemTotal);
             
             // Map barcode and accounting code from request
-            var data = requestDataMap.get(item.getItemID());
+            var data = requestDataMap.get(item.getItemId());
             if (data != null) {
                 item.setBarcode(data.getBarcode());
                 item.setAccountingCode(data.getAccountingCode());
@@ -88,7 +88,7 @@ public class WarehouseReceiptService {
             BigDecimal itemTotalAmount = importPrice.multiply(new BigDecimal(item.getBatch().getQuantityReceived()));
             
             // Update Inventory Stock
-            stockService.increaseStock(item.getBatch().getDrug().getDrugID(), item.getBatch().getQuantityReceived());
+            stockService.increaseStock(item.getBatch().getDrug().getDrugId(), item.getBatch().getQuantityReceived());
 
             // CREATE LOGBOOK ENTRY (BM.05)
             ReceivingLogbook log = ReceivingLogbook.builder()
@@ -124,3 +124,8 @@ public class WarehouseReceiptService {
         return new BigDecimal("2");
     }
 }
+
+
+
+
+

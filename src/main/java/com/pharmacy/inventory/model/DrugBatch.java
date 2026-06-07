@@ -17,7 +17,7 @@ public class DrugBatch {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String batchID;
+    private String batchId;
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
@@ -55,3 +55,8 @@ public class DrugBatch {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }
+
+
+
+
+

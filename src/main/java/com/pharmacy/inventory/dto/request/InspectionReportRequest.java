@@ -9,3 +9,8 @@ public class InspectionReportRequest {
     private LocalDate inspectionDate;
     private List<InspectionItemRequest> items;
 }
+
+
+
+
+

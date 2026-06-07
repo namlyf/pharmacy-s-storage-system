@@ -31,11 +31,12 @@ public class OrderController {
         try {
             var orders = orderService.generateDraftOrdersFromRequisition(requisitionId, principal.getName());
             redirectAttributes.addFlashAttribute("successMsg", 
-                "Generated " + orders.size() + " draft purchase orders from requisition.");
+                "Đã tạo thành công " + orders.size() + " đơn đặt hàng nháp từ bản dự trù.");
+            return "redirect:/purchase/orders";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMsg", "Lỗi tạo đơn hàng: " + e.getMessage());
+            return "redirect:/purchase/requisitions/view/" + requisitionId;
         }
-        return "redirect:/purchase/requisitions/view/" + requisitionId;
     }
 
     @GetMapping("/view/{id}")
@@ -44,8 +45,8 @@ public class OrderController {
         model.addAttribute("order", order);
         
         // Tìm danh sách thuốc đã được đăng ký lô hàng cho đơn này
-        java.util.List<String> registeredDrugIds = batchRepository.findByOrder_OrderID(id).stream()
-                .map(batch -> batch.getDrug().getDrugID())
+        java.util.List<String> registeredDrugIds = batchRepository.findByOrder_OrderId(id).stream()
+                .map(batch -> batch.getDrug().getDrugId())
                 .toList();
         model.addAttribute("registeredDrugIds", registeredDrugIds);
         
@@ -74,3 +75,8 @@ public class OrderController {
         return "redirect:/purchase/orders";
     }
 }
+
+
+
+
+

@@ -19,7 +19,7 @@ public class DrugRequisition {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String requisitionID;
+    private String requisitionId;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
@@ -44,3 +44,8 @@ public class DrugRequisition {
         item.setRequisition(this);
     }
 }
+
+
+
+
+

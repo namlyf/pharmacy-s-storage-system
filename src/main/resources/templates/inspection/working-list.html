@@ -42,7 +42,7 @@
                         <td th:text="${workingList[iter.index].vatPrice}"></td>
                         <td th:text="${workingList[iter.index].visualQualityResult}"></td>
                         <td>
-                            <form th:action="@{/inspection/reports/remove-from-list/{id}(id=${b.batchID})}" method="post">
+                            <form th:action="@{/inspection/reports/remove-from-list/{id}(id=${b.batchId})}" method="post">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-x-circle"></i> Loại bỏ
                                 </button>
@@ -64,3 +64,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+

@@ -18,7 +18,7 @@ public class ReceivingLogbook {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String logID;
+    private String logId;
 
     @ManyToOne
     @JoinColumn(name = "receipt_id", nullable = false)
@@ -73,3 +73,8 @@ public class ReceivingLogbook {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }
+
+
+
+
+

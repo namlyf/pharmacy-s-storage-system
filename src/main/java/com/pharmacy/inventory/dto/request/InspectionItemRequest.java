@@ -12,3 +12,8 @@ public class InspectionItemRequest {
     private Double storageTemperature;
     private Double vatPrice;
 }
+
+
+
+
+

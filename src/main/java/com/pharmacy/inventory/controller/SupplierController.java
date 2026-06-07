@@ -55,7 +55,7 @@ public class SupplierController {
         request.setContactPerson(supplier.getContactPerson());
         request.setPhone(supplier.getPhone());
         request.setEmail(supplier.getEmail());
-        request.setIsActive(supplier.isActive());
+        request.setActive(supplier.isActive());
 
         model.addAttribute("supplierRequest", request);
         model.addAttribute("supplierId", id);
@@ -81,3 +81,7 @@ public class SupplierController {
         return "redirect:/suppliers";
     }
 }
+
+
+
+

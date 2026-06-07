@@ -7,3 +7,8 @@ import java.util.List;
 public interface ReceivingLogbookRepository extends JpaRepository<ReceivingLogbook, String> {
     List<ReceivingLogbook> findAllByOrderByLogDateDesc();
 }
+
+
+
+
+

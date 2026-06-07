@@ -8,11 +8,15 @@ import java.util.Optional;
 
 public interface InventoryStockRepository extends JpaRepository<InventoryStock, String> {
 
-    Optional<InventoryStock> findByDrug_DrugID(String drugId);
+    Optional<InventoryStock> findByDrug_DrugId(String drugId);
 
-    boolean existsByDrug_DrugID(String drugId);
+    boolean existsByDrug_DrugId(String drugId);
 
     // Lấy danh sách đang low stock
     @Query("SELECT s FROM InventoryStock s WHERE s.currentQuantity <= s.minimumThreshold")
     List<InventoryStock> findLowStockItems();
 }
+
+
+
+

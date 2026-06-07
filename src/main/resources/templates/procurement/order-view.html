@@ -28,10 +28,10 @@
             <button onclick="window.print()" class="btn btn-dark btn-sm ms-2"><i class="bi bi-printer"></i> In đơn hàng (BM.02)</button>
         </div>
         <div sec:authorize="hasRole('PHARMACIST')" th:if="${order.status.name() == 'DRAFT'}">
-            <form th:action="@{/purchase/orders/send/{id}(id=${order.orderID})}" method="post" class="d-inline">
+            <form th:action="@{/purchase/orders/send/{id}(id=${order.orderId})}" method="post" class="d-inline">
                 <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-send"></i> Đánh dấu ĐÃ GỬI</button>
             </form>
-            <form th:action="@{/purchase/orders/delete/{id}(id=${order.orderID})}" method="post" class="d-inline ms-2"
+            <form th:action="@{/purchase/orders/delete/{id}(id=${order.orderId})}" method="post" class="d-inline ms-2"
                   onsubmit="return confirm('Xóa đơn hàng nháp này?')">
                 <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Xóa đơn</button>
             </form>
@@ -49,7 +49,7 @@
         </div>
         <div class="col-6 text-end">
             <strong>Mẫu số: BM.02.D.01</strong><br>
-            Số: <span th:text="${order.orderID.substring(0,8)}"></span>
+            Số: <span th:text="${order.orderId.substring(0,8)}"></span>
         </div>
     </div>
 
@@ -61,7 +61,7 @@
     <div class="mb-3 small">
         - Kính gửi: <strong th:text="${order.supplier.supplierName}"></strong><br>
         - Địa chỉ: <span th:text="${order.supplier.address}"></span><br>
-        - Căn cứ bản dự trù số: <span th:text="${order.requisition.requisitionID.substring(0,8)}"></span>
+        - Căn cứ bản dự trù số: <span th:text="${order.requisition.requisitionId.substring(0,8)}"></span>
     </div>
 
     <!-- Main Table -->
@@ -88,11 +88,11 @@
                 <td class="text-center" th:text="${item.quantity}"></td>
                 <td class="no-print" sec:authorize="hasRole('WAREHOUSE_STAFF')">
                     <!-- Trạng thái đăng ký lô -->
-                    <div th:if="${#lists.contains(registeredDrugIds, item.drug.drugID)}">
+                    <div th:if="${#lists.contains(registeredDrugIds, item.drug.drugId)}">
                         <span class="badge bg-success small"><i class="bi bi-check-circle"></i> Đã có lô</span>
                     </div>
-                    <div th:if="${!#lists.contains(registeredDrugIds, item.drug.drugID) && (order.status.name() == 'SENT' || order.status.name() == 'RECEIVED')}">
-                        <a th:href="@{/warehouse/batches/create(orderId=${order.orderID}, drugId=${item.drug.drugID})}" 
+                    <div th:if="${!#lists.contains(registeredDrugIds, item.drug.drugId) && (order.status.name() == 'SENT' || order.status.name() == 'RECEIVED')}">
+                        <a th:href="@{/warehouse/batches/create(orderId=${order.orderId}, drugId=${item.drug.drugId})}" 
                            class="btn btn-xs btn-outline-info p-1" style="font-size: 0.7rem;">
                             Đăng ký lô hàng
                         </a>
@@ -120,3 +120,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+

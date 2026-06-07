@@ -22,6 +22,9 @@
 <body class="bg-light">
 
 <div class="container bg-white my-4 p-5 shadow-sm">
+    <div th:if="${successMsg}" class="alert alert-success no-print" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert alert-danger no-print" th:text="${errorMsg}"></div>
+    
     <!-- Interactive Management Bar (Hidden when printing) -->
     <div class="no-print mb-4 d-flex justify-content-between align-items-center bg-light p-3 rounded border">
         <div>
@@ -30,7 +33,7 @@
         </div>
         <div th:if="${(req.overallStatus.name() == 'APPROVED' || req.overallStatus.name() == 'PARTIALLY_APPROVED')}" 
              sec:authorize="hasRole('PHARMACIST')">
-            <form th:action="@{/purchase/orders/generate/{id}(id=${req.requisitionID})}" method="post">
+            <form th:action="@{/purchase/orders/generate/{id}(id=${req.requisitionId})}" method="post">
                 <button type="submit" class="btn btn-primary btn-sm">
                     <i class="bi bi-cart-plus"></i> TẠO ĐƠN ĐẶT HÀNG
                 </button>
@@ -46,7 +49,7 @@
         </div>
         <div class="col-6 text-end">
             <strong>Mẫu số: BM.01.D.01</strong><br>
-            Số: <span th:text="${req.requisitionID.substring(0,8)}"></span>
+            Số: <span th:text="${req.requisitionId.substring(0,8)}"></span>
         </div>
     </div>
 
@@ -86,19 +89,19 @@
                 </td>
                 <td class="no-print" sec:authorize="hasRole('MANAGER')">
                     <div th:if="${item.approvalStatus.name() == 'PENDING'}" class="d-flex justify-content-center gap-1">
-                        <form th:action="@{/purchase/requisitions/item/approve/{id}(id=${item.itemID})}" method="post">
-                            <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
+                        <form th:action="@{/purchase/requisitions/item/approve/{id}(id=${item.itemId})}" method="post">
+                            <input type="hidden" name="requisitionId" th:value="${req.requisitionId}">
                             <button type="submit" class="btn btn-xs btn-success">Duyệt</button>
                         </form>
                         <button type="button" class="btn btn-xs btn-danger" 
-                                data-bs-toggle="modal" th:data-bs-target="'#rejectModal-' + ${item.itemID}">Từ chối</button>
+                                data-bs-toggle="modal" th:data-bs-target="'#rejectModal-' + ${item.itemId}">Từ chối</button>
                         
                         <!-- Reject Modal -->
-                        <div class="modal fade" th:id="'rejectModal-' + ${item.itemID}" tabindex="-1">
+                        <div class="modal fade" th:id="'rejectModal-' + ${item.itemId}" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content text-start">
-                                    <form th:action="@{/purchase/requisitions/item/reject/{id}(id=${item.itemID})}" method="post">
-                                        <input type="hidden" name="requisitionId" th:value="${req.requisitionID}">
+                                    <form th:action="@{/purchase/requisitions/item/reject/{id}(id=${item.itemId})}" method="post">
+                                        <input type="hidden" name="requisitionId" th:value="${req.requisitionId}">
                                         <div class="modal-header"><h5>Lý do từ chối</h5></div>
                                         <div class="modal-body">
                                             <textarea name="rejectionReason" class="form-control" required rows="3" placeholder="Nhập lý do..."></textarea>
@@ -147,3 +150,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+

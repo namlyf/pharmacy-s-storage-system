@@ -6,3 +6,8 @@ import java.util.Optional;
 
 public interface InspectionReportRepository extends JpaRepository<InspectionReport, String> {
 }
+
+
+
+
+

@@ -4,5 +4,10 @@ import com.pharmacy.inventory.model.InspectionItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InspectionItemRepository extends JpaRepository<InspectionItem, String> {
-    boolean existsByBatch_BatchID(String batchId);
+    boolean existsByBatch_BatchId(String batchId);
 }
+
+
+
+
+

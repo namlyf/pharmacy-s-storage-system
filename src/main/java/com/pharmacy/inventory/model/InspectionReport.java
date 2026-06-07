@@ -21,7 +21,7 @@ public class InspectionReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String reportID;
+    private String reportId;
 
     @ManyToOne
     @JoinColumn(name = "inspected_by", nullable = false)
@@ -55,3 +55,8 @@ public class InspectionReport {
         item.setReport(this);
     }
 }
+
+
+
+
+

@@ -33,7 +33,7 @@
         <div class="col-6 text-end">
             <strong>Mẫu số C21-HD</strong><br>
             (Ban hành theo QĐ số 19/2006/QĐ-BTC)<br>
-            Số phiếu: <span th:text="${r.receiptID.substring(0,8)}"></span>
+            Số phiếu: <span th:text="${r.receiptId.substring(0,8)}"></span>
         </div>
     </div>
 
@@ -44,7 +44,7 @@
 
     <div class="row mb-3">
         <div class="col-12">
-            - Nhập theo biên bản kiểm nhập số: <span th:text="${r.report.reportID.substring(0,8)}"></span> ngày <span th:text="${r.report.inspectionDate}"></span><br>
+            - Nhập theo biên bản kiểm nhập số: <span th:text="${r.report.reportId.substring(0,8)}"></span> ngày <span th:text="${r.report.inspectionDate}"></span><br>
             - Nhà cung cấp: <span th:text="${r.report.items[0].batch.order.supplier.supplierName}"></span><br>
             - Nhập tại kho: Kho chính - Nhà thuốc bệnh viện
         </div>
@@ -126,3 +126,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+

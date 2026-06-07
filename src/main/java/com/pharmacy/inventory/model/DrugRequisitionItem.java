@@ -17,7 +17,7 @@ public class DrugRequisitionItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String itemID;
+    private String itemId;
 
     @ManyToOne
     @JoinColumn(name = "requisition_id", nullable = false)
@@ -56,4 +56,13 @@ public class DrugRequisitionItem {
     private Account approvedBy;
 
     private LocalDateTime approvedAt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean isOrdered = false;
 }
+
+
+
+
+

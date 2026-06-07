@@ -20,3 +20,8 @@ public class LogbookController {
         return "warehouse/logbook-list";
     }
 }
+
+
+
+
+

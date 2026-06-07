@@ -65,24 +65,25 @@
                                   th:text="${drug.category}"></span>
                         </td>
                         <td>
-                            <span th:if="${drug.active}" class="badge bg-success">Đang hoạt động</span>
-                            <span th:unless="${drug.active}" class="badge bg-danger">Ngừng hoạt động</span>
+                            <span class="badge" 
+                                  th:classappend="${drug.status.name() == 'ACTIVE' ? 'bg-success' : (drug.status.name() == 'DRAFT' ? 'bg-warning text-dark' : 'bg-secondary')}"
+                                  th:text="${drug.status}"></span>
                         </td>
                         <td>
-                            <a th:href="@{/drugs/edit/{id}(id=${drug.drugID})}"
+                            <a th:href="@{/drugs/edit/{id}(id=${drug.drugId})}"
                                class="btn btn-sm btn-outline-primary">
                                 <i class="bi bi-pencil"></i>
                             </a>
-                            <form th:if="${drug.active}"
-                                  th:action="@{/drugs/deactivate/{id}(id=${drug.drugID})}"
+                            <form th:if="${drug.status.name() == 'ACTIVE'}"
+                                  th:action="@{/drugs/deactivate/{id}(id=${drug.drugId})}"
                                   method="post" style="display:inline;">
                                 <button class="btn btn-sm btn-outline-danger"
                                         onclick="return confirm('Ngừng hoạt động thuốc này?')">
                                     <i class="bi bi-x-circle"></i>
                                 </button>
                             </form>
-                            <form th:unless="${drug.active}"
-                                  th:action="@{/drugs/activate/{id}(id=${drug.drugID})}"
+                            <form th:if="${drug.status.name() != 'ACTIVE'}"
+                                  th:action="@{/drugs/activate/{id}(id=${drug.drugId})}"
                                   method="post" style="display:inline;">
                                 <button class="btn btn-sm btn-outline-success">
                                     <i class="bi bi-check-circle"></i>
@@ -104,3 +105,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+

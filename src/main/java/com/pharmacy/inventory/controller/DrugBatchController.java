@@ -34,7 +34,7 @@ public class DrugBatchController {
         java.util.List<String> inspectedBatchIds = inspectionItemRepository.findAll().stream()
                 .filter(item -> item.getReport().getStatus() == ApprovalStatus.PENDING || 
                                 item.getReport().getStatus() == ApprovalStatus.APPROVED)
-                .map(item -> item.getBatch().getBatchID())
+                .map(item -> item.getBatch().getBatchId())
                 .toList();
         model.addAttribute("inspectedBatchIds", inspectedBatchIds);
 
@@ -55,7 +55,7 @@ public class DrugBatchController {
                              Model model) {
         Order order = orderService.getById(orderId);
         OrderItem item = order.getItems().stream()
-            .filter(i -> i.getDrug().getDrugID().equals(drugId))
+            .filter(i -> i.getDrug().getDrugId().equals(drugId))
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Drug not found in order"));
 
@@ -84,3 +84,8 @@ public class DrugBatchController {
         return "redirect:/purchase/orders/view/" + batchRequest.getOrderId();
     }
 }
+
+
+
+
+

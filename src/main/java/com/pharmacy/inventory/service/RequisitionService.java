@@ -50,8 +50,8 @@ public class RequisitionService {
                 .orElseThrow(() -> new RuntimeException("Drug not found: " + itemReq.getDrugId()));
 
             Supplier supplier = null;
-            if (itemReq.getPreferredSupplierId() != null && !itemReq.getPreferredSupplierId().isEmpty()) {
-                supplier = supplierRepository.findById(itemReq.getPreferredSupplierId()).orElse(null);
+            if (itemReq.getPreferredsupplierId() != null && !itemReq.getPreferredsupplierId().isEmpty()) {
+                supplier = supplierRepository.findById(itemReq.getPreferredsupplierId()).orElse(null);
             }
 
             DrugRequisitionItem item = DrugRequisitionItem.builder()
@@ -92,10 +92,19 @@ public class RequisitionService {
         item.setApprovedBy(manager);
         item.setApprovedAt(LocalDateTime.now());
 
+        // --- Tự động chuyển trạng thái thuốc sang ACTIVE khi được duyệt dự trù ---
+        if (status == ApprovalStatus.APPROVED) {
+            Drug drug = item.getDrug();
+            if (drug.getStatus() == com.pharmacy.inventory.enums.DrugStatus.DRAFT) {
+                drug.setStatus(com.pharmacy.inventory.enums.DrugStatus.ACTIVE);
+                drugRepository.save(drug);
+            }
+        }
+
         itemRepository.save(item);
 
         // Update overall status of the requisition
-        updateOverallStatus(item.getRequisition().getRequisitionID());
+        updateOverallStatus(item.getRequisition().getRequisitionId());
     }
 
     private void updateOverallStatus(String requisitionId) {
@@ -131,3 +140,8 @@ public class RequisitionService {
         requisitionRepository.save(requisition);
     }
 }
+
+
+
+
+

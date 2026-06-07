@@ -32,12 +32,12 @@ public class InventoryStockService {
     }
 
     public InventoryStock getByDrugId(String drugId) {
-        return stockRepository.findByDrug_DrugID(drugId)
+        return stockRepository.findByDrug_DrugId(drugId)
             .orElseThrow(() -> new RuntimeException("Stock not found for drug: " + drugId));
     }
 
     public InventoryStock create(InventoryStockRequest request) {
-        if (stockRepository.existsByDrug_DrugID(request.getDrugId())) {
+        if (stockRepository.existsByDrug_DrugId(request.getDrugId())) {
             throw new RuntimeException("Stock entry already exists for this drug.");
         }
 
@@ -68,7 +68,7 @@ public class InventoryStockService {
 
     // Gọi method này khi BM.04 được approve → cộng thêm số lượng vào kho
     public void increaseStock(String drugId, int quantity) {
-        InventoryStock stock = stockRepository.findByDrug_DrugID(drugId)
+        InventoryStock stock = stockRepository.findByDrug_DrugId(drugId)
             .orElseThrow(() -> new RuntimeException("Stock not found for drug: " + drugId));
 
         stock.setCurrentQuantity(stock.getCurrentQuantity() + quantity);
@@ -82,7 +82,7 @@ public class InventoryStockService {
 
     // Gọi khi tạo Drug mới → tự tạo stock entry luôn
     public void initializeStock(Drug drug, Integer minimumThreshold) {
-        if (stockRepository.existsByDrug_DrugID(drug.getDrugID())) {
+        if (stockRepository.existsByDrug_DrugId(drug.getDrugId())) {
             return; // Đã có rồi thì bỏ qua
         }
         InventoryStock stock = new InventoryStock();
@@ -94,9 +94,14 @@ public class InventoryStockService {
 
     // Gọi khi update Drug → cập nhật threshold
     public void updateThreshold(String drugId, Integer minimumThreshold) {
-        stockRepository.findByDrug_DrugID(drugId).ifPresent(stock -> {
+        stockRepository.findByDrug_DrugId(drugId).ifPresent(stock -> {
             stock.setMinimumThreshold(minimumThreshold != null ? minimumThreshold : 0);
             stockRepository.save(stock);
         });
     }
 }
+
+
+
+
+

@@ -47,19 +47,27 @@ public class OrderService {
         Account creator = accountRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Chỉ lấy các item đã APPROVED và chưa có trong Order nào (giả định đơn giản cho MVP)
+        // Chỉ lấy các item đã APPROVED và CHƯA ĐƯỢC ĐẶT HÀNG
         List<DrugRequisitionItem> approvedItems = requisition.getItems().stream()
-            .filter(item -> item.getApprovalStatus() == ApprovalStatus.APPROVED)
+            .filter(item -> item.getApprovalStatus() == ApprovalStatus.APPROVED && !item.isOrdered())
             .toList();
 
         if (approvedItems.isEmpty()) {
-            throw new RuntimeException("No approved items found in this requisition.");
+            throw new RuntimeException("Không tìm thấy mặt hàng nào đã duyệt (hoặc tất cả đã được tạo đơn hàng trước đó).");
         }
 
         // Gom nhóm theo Supplier
         Map<Supplier, List<DrugRequisitionItem>> groupedBySupplier = approvedItems.stream()
             .filter(item -> item.getPreferredSupplier() != null)
             .collect(Collectors.groupingBy(DrugRequisitionItem::getPreferredSupplier));
+
+        if (groupedBySupplier.isEmpty()) {
+            String missingSupplierDrugs = approvedItems.stream()
+                .filter(item -> item.getPreferredSupplier() == null)
+                .map(item -> item.getDrug().getDrugName())
+                .collect(Collectors.joining(", "));
+            throw new RuntimeException("Các mặt hàng được duyệt (" + missingSupplierDrugs + ") chưa được chỉ định Nhà cung cấp dự kiến. Vui lòng kiểm tra lại bản dự trù.");
+        }
 
         List<Order> createdOrders = new ArrayList<>();
 
@@ -74,7 +82,7 @@ public class OrderService {
                 .orderDate(LocalDate.now())
                 .createdAt(LocalDateTime.now())
                 .status(OrderStatus.DRAFT)
-                .notes("Generated from Requisition: " + requisitionId)
+                .notes("Được tạo tự động từ bản dự trù: " + requisitionId)
                 .build();
 
             for (DrugRequisitionItem reqItem : items) {
@@ -85,9 +93,13 @@ public class OrderService {
                     .packagingSpec(reqItem.getPackagingSpec())
                     .build();
                 order.addItem(orderItem);
+                
+                // Đánh dấu đã đặt hàng
+                reqItem.setOrdered(true);
             }
 
             createdOrders.add(orderRepository.save(order));
+            requisitionItemRepository.saveAll(items);
         }
 
         return createdOrders;
@@ -116,3 +128,8 @@ public class OrderService {
         orderRepository.delete(order);
     }
 }
+
+
+
+
+

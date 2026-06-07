@@ -28,7 +28,7 @@ public class DrugBatchService {
     }
 
     public List<DrugBatch> getByOrderId(String orderId) {
-        return batchRepository.findByOrder_OrderID(orderId);
+        return batchRepository.findByOrder_OrderId(orderId);
     }
 
     public DrugBatch getById(String id) {
@@ -70,3 +70,8 @@ public class DrugBatchService {
         return batchRepository.save(batch);
     }
 }
+
+
+
+
+

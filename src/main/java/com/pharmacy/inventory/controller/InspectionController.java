@@ -139,3 +139,8 @@ public class InspectionController {
         return "redirect:/inspection/reports/view/" + id;
     }
 }
+
+
+
+
+

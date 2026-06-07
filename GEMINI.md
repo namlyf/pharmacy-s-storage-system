@@ -4,7 +4,7 @@
 Hệ thống quản lý kho dược phẩm cho Bệnh viện Đại học Y Hà Nội, tuân thủ quy trình SOP 01-GPP.
 
 ## Tech Stack
-- **Backend:** Java 17, Spring Boot 3.5.14
+- **Backend:** Java 17, Spring Boot 3.2.5
 - **Database:** MySQL (pharmacy_db)
 - **Security:** Spring Security (MANAGER, PHARMACIST, WAREHOUSE_STAFF)
 - **Frontend:** Thymeleaf + Bootstrap 5
@@ -24,6 +24,7 @@ Hệ thống quản lý kho dược phẩm cho Bệnh viện Đại học Y Hà 
 ## Coding Conventions
 - Sử dụng **Lombok** (`@RequiredArgsConstructor`) cho Dependency Injection trong Controller/Service.
 - Entity sử dụng **UUID** cho Primary Key.
+- **Drug Lifecycle:** Thuốc mới tạo có trạng thái `DRAFT`. Khi Bản dự trù (BM.01) chứa thuốc đó được **Duyệt**, thuốc sẽ tự động chuyển sang `ACTIVE`.
 - Phân loại thuốc (Category) tự động dựa trên Số đăng ký (Registration Number).
 - Luôn cập nhật `InventoryStock` khi tạo mới hoặc cập nhật `Drug`.
 

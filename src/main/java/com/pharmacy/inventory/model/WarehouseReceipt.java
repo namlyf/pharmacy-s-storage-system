@@ -18,7 +18,7 @@ public class WarehouseReceipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String receiptID;
+    private String receiptId;
 
     @OneToOne
     @JoinColumn(name = "report_id", nullable = false, unique = true)
@@ -61,3 +61,8 @@ public class WarehouseReceipt {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }
+
+
+
+
+

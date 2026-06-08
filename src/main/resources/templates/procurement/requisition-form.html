@@ -40,11 +40,12 @@
                 <table class="table table-bordered mb-0" id="itemsTable">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 30%;">Thuốc/Vật tư</th>
+                            <th style="width: 25%;">Thuốc/Vật tư</th>
                             <th style="width: 10%;">Số lượng</th>
                             <th style="width: 10%;">Đơn vị</th>
-                            <th style="width: 20%;">Nhà cung cấp dự kiến</th>
-                            <th style="width: 25%;">Lý do / Ghi chú</th>
+                            <th style="width: 15%;">Quy cách</th>
+                            <th style="width: 15%;">Nhà cung cấp dự kiến</th>
+                            <th style="width: 20%;">Lý do / Ghi chú</th>
                             <th style="width: 5%;"></th>
                         </tr>
                     </thead>
@@ -66,6 +67,10 @@
                             <td>
                                 <input type="text" th:field="*{items[__${stat.index}__].unit}" 
                                        class="form-control unit-input" required>
+                            </td>
+                            <td>
+                                <input type="text" th:field="*{items[__${stat.index}__].packagingSpec}" 
+                                       class="form-control spec-input" readonly>
                             </td>
                             <td>
                                 <select th:field="*{items[__${stat.index}__].preferredsupplierId}" class="form-select">
@@ -132,9 +137,13 @@
             select.onchange = function() {
                 const selectedOption = this.options[this.selectedIndex];
                 const unit = selectedOption.getAttribute('data-unit');
+                const spec = selectedOption.getAttribute('data-spec');
                 const row = this.closest('tr');
                 if (unit) {
                     row.querySelector('.unit-input').value = unit;
+                }
+                if (spec) {
+                    row.querySelector('.spec-input').value = spec;
                 }
             };
         });

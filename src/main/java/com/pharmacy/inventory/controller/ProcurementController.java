@@ -49,7 +49,7 @@ public class ProcurementController {
         }
 
         model.addAttribute("requisitionRequest", request);
-        model.addAttribute("drugs", drugService.getAllActive());
+        model.addAttribute("drugs", drugService.getAll());
         model.addAttribute("suppliers", supplierService.getAllActive());
         return "procurement/requisition-form";
     }
@@ -69,35 +69,67 @@ public class ProcurementController {
     }
 
     @GetMapping("/view/{id}")
-    public String view(@PathVariable String id, Model model) {
-        DrugRequisition requisition = requisitionService.getById(id);
-        model.addAttribute("req", requisition);
-        return "procurement/requisition-view";
+    public String view(@PathVariable String id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            DrugRequisition requisition = requisitionService.getById(id);
+            model.addAttribute("req", requisition);
+            return "procurement/requisition-view";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Không tìm thấy phiếu dự trù: " + e.getMessage());
+            return "redirect:/purchase/requisitions";
+        }
     }
 
     @PostMapping("/item/approve/{itemId}")
     public String approveItem(@PathVariable String itemId,
-                              @RequestParam String requisitionId,
+                              @RequestParam(required = false) String requisitionId,
                               Principal principal,
                               RedirectAttributes redirectAttributes) {
-        requisitionService.approveItem(itemId, principal.getName());
-        redirectAttributes.addFlashAttribute("successMsg", "Line item approved.");
+        if (requisitionId == null || requisitionId.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Thiếu mã phiếu dự trù.");
+            return "redirect:/purchase/requisitions";
+        }
+        try {
+            requisitionService.approveItem(itemId, principal.getName());
+            redirectAttributes.addFlashAttribute("successMsg", "Dòng hàng đã được phê duyệt.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Lỗi phê duyệt: " + e.getMessage());
+        }
         return "redirect:/purchase/requisitions/view/" + requisitionId;
     }
 
     @PostMapping("/item/reject/{itemId}")
     public String rejectItem(@PathVariable String itemId,
-                             @RequestParam String requisitionId,
-                             @RequestParam String rejectionReason,
+                             @RequestParam(required = false) String requisitionId,
+                             @RequestParam(required = false) String rejectionReason,
                              Principal principal,
                              RedirectAttributes redirectAttributes) {
-        if (rejectionReason == null || rejectionReason.isBlank()) {
-            redirectAttributes.addFlashAttribute("errorMsg", "Rejection reason is required.");
-            return "redirect:/purchase/requisitions/view/" + requisitionId;
+        if (requisitionId == null || requisitionId.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Thiếu mã phiếu dự trù.");
+            return "redirect:/purchase/requisitions";
         }
-        requisitionService.rejectItem(itemId, rejectionReason, principal.getName());
-        redirectAttributes.addFlashAttribute("successMsg", "Line item rejected.");
+        try {
+            if (rejectionReason == null || rejectionReason.isBlank()) {
+                redirectAttributes.addFlashAttribute("errorMsg", "Lý do từ chối là bắt buộc.");
+                return "redirect:/purchase/requisitions/view/" + requisitionId;
+            }
+            requisitionService.rejectItem(itemId, rejectionReason, principal.getName());
+            redirectAttributes.addFlashAttribute("successMsg", "Dòng hàng đã bị từ chối.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Lỗi từ chối: " + e.getMessage());
+        }
         return "redirect:/purchase/requisitions/view/" + requisitionId;
+    }
+
+    @PostMapping("/delete/{id}")
+    public String delete(@PathVariable String id, RedirectAttributes redirectAttributes) {
+        try {
+            requisitionService.deleteRequisition(id);
+            redirectAttributes.addFlashAttribute("successMsg", "Đã xóa bản dự trù thành công.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Lỗi: " + e.getMessage());
+        }
+        return "redirect:/purchase/requisitions";
     }
 }
 

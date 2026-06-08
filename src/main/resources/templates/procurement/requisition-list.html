@@ -42,10 +42,19 @@
                         </td>
                         <td th:text="${r.items.size()}">0</td>
                         <td>
-                            <a th:href="@{/purchase/requisitions/view/{id}(id=${r.requisitionId})}"
-                               class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-eye"></i> Xem chi tiết
-                            </a>
+                            <div class="d-flex gap-1">
+                                <a th:href="@{/purchase/requisitions/view/{id}(id=${r.requisitionId})}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                                <form th:if="${r.overallStatus.name() == 'PENDING'}"
+                                      th:action="@{/purchase/requisitions/delete/{id}(id=${r.requisitionId})}"
+                                      method="post" onsubmit="return confirm('Xác nhận xóa bản dự trù này?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i> Xóa
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     <tr th:if="${requisitions.empty}">

@@ -139,6 +139,15 @@ public class RequisitionService {
 
         requisitionRepository.save(requisition);
     }
+
+    @Transactional
+    public void deleteRequisition(String id) {
+        DrugRequisition requisition = getById(id);
+        if (requisition.getOverallStatus() != RequisitionStatus.PENDING) {
+            throw new RuntimeException("Chỉ có thể xóa bản dự trù đang ở trạng thái CHỜ DUYỆT (PENDING).");
+        }
+        requisitionRepository.delete(requisition);
+    }
 }
 
 

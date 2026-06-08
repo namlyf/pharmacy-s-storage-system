@@ -14,9 +14,10 @@ public class DrugBatchRequest {
     private String storageCondition;
     private String invoiceNumber;
     private LocalDate invoiceDate;
+
+    // Inspection fields for simplified flow
+    private Double vatPrice;
+    private String visualQualityResult;
+    private boolean invoiceValid = true;
+    private boolean storageConditionMatch = true;
 }
-
-
-
-
-

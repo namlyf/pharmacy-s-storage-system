@@ -1,20 +1,75 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Quản lý lô hàng')}"></head>
+<head th:replace="~{layout/base :: head('Tiếp nhận hàng')}"></head>
 <body>
 <div th:replace="~{layout/base :: navbar}"></div>
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
+    
+    <!-- PHẦN 1: DANH SÁCH CHỜ GỬI DUYỆT (WORKING LIST) -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4><i class="bi bi-boxes"></i> Danh sách lô thuốc đã đăng ký</h4>
+        <h4 class="text-primary"><i class="bi bi-cart-plus"></i> 1. Danh sách chờ gửi duyệt (Giỏ hàng)</h4>
+        <form th:if="${!workingBatches.empty}" th:action="@{/inspection/reports/submit}" method="post">
+            <button type="submit" class="btn btn-success px-4 fw-bold">
+                <i class="bi bi-send-check"></i> GỬI BIÊN BẢN TỔNG (BM.03)
+            </button>
+        </form>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-5 bg-light">
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0 align-middle">
+                <thead class="table-primary text-center">
+                    <tr>
+                        <th style="width: 25%;">Tên thuốc</th>
+                        <th>Số lô</th>
+                        <th>Hạn dùng</th>
+                        <th>SL nhập</th>
+                        <th>Nhà cung cấp</th>
+                        <th style="width: 10%;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="wb : ${workingBatches}" class="bg-white">
+                        <td>
+                            <strong th:text="${wb.drug.drugName}"></strong><br>
+                            <small class="text-muted" th:text="${wb.drug.concentration}"></small>
+                        </td>
+                        <td class="text-center"><code th:text="${wb.lotNumber}"></code></td>
+                        <td class="text-center" th:text="${wb.expirationDate}"></td>
+                        <td class="text-center" th:text="${wb.quantityReceived}"></td>
+                        <td th:text="${wb.order.supplier.supplierName}"></td>
+                        <td class="text-center">
+                            <form th:action="@{/inspection/reports/remove-from-list/{id}(id=${wb.batchId})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Bỏ
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${workingBatches.empty}">
+                        <td colspan="6" class="text-center py-4 text-muted fst-italic">
+                            Chưa có lô hàng nào trong danh sách chờ. Hãy vào "Đơn hàng" để đăng ký lô mới.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <!-- PHẦN 2: TẤT CẢ LÔ HÀNG ĐÃ ĐĂNG KÝ (HISTORY) -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="text-secondary"><i class="bi bi-clock-history"></i> 2. Lịch sử tất cả lô hàng</h4>
     </div>
 
     <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
 
-    <div class="card shadow-sm">
+    <div class="card shadow-sm border-0">
         <div class="card-body p-0">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 align-middle">
                 <thead class="table-light">
                     <tr>
                         <th>Tên thuốc</th>
@@ -35,67 +90,29 @@
                         <td th:text="${b.invoiceNumber}"></td>
                         <td th:text="${b.order.supplier.supplierName}"></td>
                         <td>
-                            <div sec:authorize="hasRole('WAREHOUSE_STAFF')">
-                                <!-- Trạng thái: Đã có trong biên bản chính thức -->
-                                <span th:if="${#lists.contains(inspectedBatchIds, b.batchId)}" class="badge bg-success">
-                                    <i class="bi bi-check-all"></i> Đã lập biên bản
+                            <!-- Đã lập biên bản -->
+                            <a th:if="${batchToReportMap.containsKey(b.batchId)}" 
+                               th:href="@{/inspection/reports/view/{id}(id=${batchToReportMap.get(b.batchId)})}"
+                               class="text-decoration-none">
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-all"></i> Đã có BM.03
                                 </span>
+                            </a>
 
-                                <!-- Trạng thái: Đang nằm trong danh sách chờ gửi (Working List) -->
-                                <span th:if="${#lists.contains(workingBatchIds, b.batchId)}" class="badge bg-warning text-dark">
-                                    <i class="bi bi-hourglass-split"></i> Chờ gửi duyệt
-                                </span>
-
-                                <!-- Nút: Thêm vào biên bản (Chỉ hiện nếu chưa có ở cả 2 nơi trên) -->
-                                <button th:if="${!#lists.contains(inspectedBatchIds, b.batchId) && !#lists.contains(workingBatchIds, b.batchId)}"
-                                        type="button" class="btn btn-sm btn-primary" 
-                                        data-bs-toggle="modal" 
-                                        th:data-bs-target="'#inspectModal-' + ${b.batchId}">
-                                    <i class="bi bi-plus-circle"></i> Thêm vào biên bản
-                                </button>
-
-                                <!-- Modal nhập thông tin kiểm nhập (Giữ nguyên) -->
-                                <div th:if="${!#lists.contains(inspectedBatchIds, b.batchId) && !#lists.contains(workingBatchIds, b.batchId)}"
-                                     class="modal fade" th:id="'inspectModal-' + ${b.batchId}" tabindex="-1">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <form th:action="@{/inspection/reports/add-to-list}" method="post">
-                                                <input type="hidden" name="batchId" th:value="${b.batchId}">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Kiểm nhập lô: [[${b.lotNumber}]]</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body text-start">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Giá nhập VAT (đơn vị nhỏ nhất)</label>
-                                                        <input type="number" name="vatPrice" class="form-control" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Kết quả cảm quan</label>
-                                                        <textarea name="visualQualityResult" class="form-control" rows="2" placeholder="Ví dụ: Bao bì nguyên vẹn, thuốc không đổi màu..."></textarea>
-                                                    </div>
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox" name="invoiceValid" checked id="check1">
-                                                        <label class="form-check-label" for="check1">Hóa đơn hợp lệ</label>
-                                                    </div>
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox" name="storageConditionMatch" checked id="check2">
-                                                        <label class="form-check-label" for="check2">Điều kiện bảo quản khớp</label>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                                    <button type="submit" class="btn btn-primary">Xác nhận thêm</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Đang trong danh sách chờ -->
+                            <span th:if="${#lists.contains(workingBatchIds, b.batchId)}" class="badge bg-warning text-dark">
+                                <i class="bi bi-hourglass-split"></i> Đang chờ gửi
+                            </span>
+                            
+                            <!-- Chưa làm gì -->
+                            <span th:if="${!batchToReportMap.containsKey(b.batchId) && !#lists.contains(workingBatchIds, b.batchId)}" 
+                                  class="badge bg-secondary">
+                                <i class="bi bi-dash-circle"></i> Chưa kiểm nhập
+                            </span>
                         </td>
                     </tr>
                     <tr th:if="${batches.empty}">
-                        <td colspan="7" class="text-center py-4 text-muted">Chưa có lô thuốc nào được đăng ký.</td>
+                        <td colspan="7" class="text-center py-4 text-muted">Chưa có dữ liệu lô hàng.</td>
                     </tr>
                 </tbody>
             </table>
@@ -106,6 +123,3 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

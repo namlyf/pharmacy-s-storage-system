@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>Biên bản kiểm nhập BM.03 – Pharmacy System</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-            .container { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
-        }
-        .form-header { font-size: 0.85rem; }
-        .form-title { text-align: center; margin: 20px 0; }
-        .table-report th, .table-report td { font-size: 0.75rem; border: 1px solid #000 !important; vertical-align: middle; }
-        .signature-box { height: 80px; }
-    </style>
-</head>
+<head th:replace="~{layout/base :: head('Biên bản kiểm nhập BM.03')}"></head>
 <body class="bg-light">
+<div th:replace="~{layout/base :: navbar}"></div>
 
-<div class="container bg-white my-4 p-5 shadow-sm">
-    <div class="no-print mb-4 d-flex justify-content-between">
-        <a href="/inspection/reports" class="btn btn-secondary btn-sm">Quay lại danh sách</a>
-        <button onclick="window.print()" class="btn btn-primary btn-sm">In biên bản (BM.03)</button>
+<div class="container bg-white my-4 p-5 shadow-sm border rounded">
+    <div class="no-print mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <a href="/inspection/reports" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Quay lại danh sách
+            </a>
+            <button onclick="window.print()" class="btn btn-dark btn-sm ms-2">
+                <i class="bi bi-printer"></i> In biên bản (BM.03)
+            </button>
+        </div>
+        
+        <!-- Quick Action for Warehouse Staff after Approval -->
+        <div th:if="${report.status.name() == 'APPROVED' && report.receipt == null}" sec:authorize="hasRole('WAREHOUSE_STAFF')">
+            <a th:href="@{/warehouse/receipts/create(reportId=${report.reportId})}" class="btn btn-success btn-sm">
+                <i class="bi bi-receipt"></i> LẬP PHIẾU NHẬP KHO (BM.04)
+            </a>
+        </div>
+        <div th:if="${report.receipt != null}">
+            <span class="badge bg-info text-dark p-2">
+                <i class="bi bi-check-all"></i> Đã lập phiếu nhập kho
+            </span>
+        </div>
+    </div>
+
+    <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show no-print" role="alert">
+        <span th:text="${successMsg}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
 
     <!-- Header -->
@@ -32,74 +42,76 @@
         </div>
         <div class="col-5 text-end">
             <strong>Mẫu số: BM.03.D.01</strong><br>
-            Mã BB: <span th:text="${report.reportId.substring(0,8)}"></span>
+            Mã BB: <span class="fw-bold" th:text="${report.reportId.substring(0,8)}"></span>
         </div>
     </div>
 
-    <div class="form-title">
-        <h4>BIÊN BẢN KIỂM NHẬP THUỐC</h4>
+    <div class="form-title text-center my-4">
+        <h4 class="fw-bold">BIÊN BẢN KIỂM NHẬP THUỐC</h4>
         <p>Ngày <span th:text="${report.inspectionDate.dayOfMonth}"></span> tháng <span th:text="${report.inspectionDate.monthValue}"></span> năm <span th:text="${report.inspectionDate.year}"></span></p>
     </div>
 
     <div class="mb-3 small">
-        - Căn cứ hóa đơn số: <span th:text="${report.items[0].batch.invoiceNumber}"></span> ngày <span th:text="${report.items[0].batch.invoiceDate}"></span> của <span th:text="${report.items[0].batch.order.supplier.supplierName}"></span><br>
+        - Căn cứ hóa đơn số: <strong th:text="${report.items[0].batch.invoiceNumber}"></strong> ngày <span th:text="${report.items[0].batch.invoiceDate}"></span> của <strong th:text="${report.items[0].batch.order.supplier.supplierName}"></strong><br>
         - Hội đồng kiểm nhập đã tiến hành kiểm tra các mặt hàng sau:
     </div>
 
     <!-- Main Table -->
-    <table class="table table-bordered table-report align-middle">
-        <thead class="text-center bg-light">
-            <tr>
-                <th>STT</th>
-                <th>Tên thuốc, nồng độ, hàm lượng</th>
-                <th>Hoạt chất</th>
-                <th>ĐVT</th>
-                <th>SĐK</th>
-                <th>Số lô</th>
-                <th>Hạn dùng</th>
-                <th>Hãng / Nước SX</th>
-                <th>Số lượng</th>
-                <th>Đơn giá VAT</th>
-                <th>Cảm quan</th>
-                <th>Nhiệt độ BQ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="item, iter : ${report.items}">
-                <td class="text-center" th:text="${iter.count}"></td>
-                <td>
-                    <strong th:text="${item.batch.drug.drugName}"></strong><br>
-                    <small th:text="${item.batch.drug.concentration}"></small>
-                </td>
-                <td th:text="${item.batch.drug.activeIngredient}"></td>
-                <td class="text-center" th:text="${item.batch.drug.unit}"></td>
-                <td class="text-center">
-                    <span th:text="${item.batch.drug.registrationNumber}"></span><br>
-                    <small th:class="${item.sdkValid ? 'text-success' : 'text-danger'}" 
-                           th:text="${item.sdkValid ? '(Khớp)' : '(Sai ĐK)'}"></small>
-                </td>
-                <td class="text-center" th:text="${item.batch.lotNumber}"></td>
-                <td class="text-center">
-                    <span th:text="${item.batch.expirationDate}"></span><br>
-                    <small th:class="${item.shelfLifeValid ? 'text-success' : 'text-danger'}" 
-                           th:text="${item.shelfLifeValid ? '(Đủ hạn)' : '(Hạn ngắn)'}"></small>
-                </td>
-                <td class="text-center">
-                    <span th:text="${item.batch.drug.manufacturer}"></span><br>
-                    <span th:text="${item.batch.drug.countryOfOrigin}"></span>
-                </td>
-                <td class="text-center" th:text="${item.batch.quantityReceived}"></td>
-                <td class="text-end" th:text="${#numbers.formatDecimal(item.vatPrice, 0, 'COMMA', 0, 'POINT')}"></td>
-                <td class="text-center" th:text="${item.visualQualityResult}"></td>
-                <td class="text-center" th:text="${item.storageTemperature != null ? item.storageTemperature + '°C' : '25°C'}"></td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="text-center bg-light small">
+                <tr>
+                    <th style="width: 30px;">STT</th>
+                    <th>Tên thuốc, nồng độ, hàm lượng</th>
+                    <th>Hoạt chất</th>
+                    <th>ĐVT</th>
+                    <th>SĐK</th>
+                    <th>Số lô</th>
+                    <th>Hạn dùng</th>
+                    <th>Hãng / Nước SX</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá VAT</th>
+                    <th>Cảm quan</th>
+                    <th>BQ</th>
+                </tr>
+            </thead>
+            <tbody class="small">
+                <tr th:each="item, iter : ${report.items}">
+                    <td class="text-center" th:text="${iter.count}"></td>
+                    <td>
+                        <strong th:text="${item.batch.drug.drugName}"></strong><br>
+                        <small th:text="${item.batch.drug.concentration}"></small>
+                    </td>
+                    <td th:text="${item.batch.drug.activeIngredient}"></td>
+                    <td class="text-center" th:text="${item.batch.drug.unit}"></td>
+                    <td class="text-center">
+                        <span th:text="${item.batch.drug.registrationNumber}"></span><br>
+                        <small th:class="${item.sdkValid ? 'text-success' : 'text-danger'}" 
+                               th:text="${item.sdkValid ? '(Khớp)' : '(Sai ĐK)'}"></small>
+                    </td>
+                    <td class="text-center" th:text="${item.batch.lotNumber}"></td>
+                    <td class="text-center">
+                        <span th:text="${item.batch.expirationDate}"></span><br>
+                        <small th:class="${item.shelfLifeValid ? 'text-success' : 'text-danger'}" 
+                               th:text="${item.shelfLifeValid ? '(Đủ hạn)' : '(Hạn ngắn)'}"></small>
+                    </td>
+                    <td class="text-center">
+                        <span th:text="${item.batch.drug.manufacturer}"></span><br>
+                        <span th:text="${item.batch.drug.countryOfOrigin}"></span>
+                    </td>
+                    <td class="text-center" th:text="${item.batch.quantityReceived}"></td>
+                    <td class="text-end" th:text="${#numbers.formatDecimal(item.vatPrice, 0, 'COMMA', 0, 'POINT')}"></td>
+                    <td class="text-center" th:text="${item.visualQualityResult}"></td>
+                    <td class="text-center" th:text="${item.storageTemperature != null ? item.storageTemperature + '°C' : '25°C'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <div class="row mt-3 small">
         <div class="col-12">
             <strong>Kết luận:</strong> Các mặt hàng trên đều đạt yêu cầu về số lượng và chất lượng, thống nhất nhập kho.
-            <p th:if="${report.status.name() == 'REJECTED'}" class="text-danger mt-2">
+            <p th:if="${report.status.name() == 'REJECTED'}" class="text-danger mt-2 border p-2 rounded bg-light">
                 <strong>Lý do từ chối:</strong> [[${report.rejectionReason}]]
             </p>
         </div>
@@ -109,43 +121,69 @@
     <div class="row mt-4 text-center small">
         <div class="col">
             <strong>Chủ tịch Hội đồng</strong><br>(Ký, họ tên)
-            <div class="signature-box"></div>
+            <div class="signature-box border-bottom mx-4 my-2" style="height: 60px;"></div>
         </div>
         <div class="col">
             <strong>Thư ký</strong><br>(Ký, họ tên)
-            <div class="signature-box"></div>
+            <div class="signature-box border-bottom mx-4 my-2" style="height: 60px;"></div>
         </div>
         <div class="col">
             <strong>Thủ kho</strong><br>(Ký, họ tên)
-            <div class="signature-box"></div>
+            <div class="signature-box border-bottom mx-4 my-2" style="height: 60px;"></div>
         </div>
         <div class="col">
             <strong>Người kiểm nhập</strong><br>(Ký, họ tên)
-            <div class="signature-box"></div>
-            <span th:text="${report.inspectedBy.fullName}"></span>
+            <div class="signature-box border-bottom mx-4 my-2" style="height: 60px;"></div>
+            <span class="fw-bold" th:text="${report.inspectedBy.fullName}"></span>
         </div>
     </div>
     
-    <!-- Manager Approval Overlay (only visible on screen) -->
-    <div class="no-print mt-5 border-top pt-3" th:if="${report.status.name() == 'PENDING'}" sec:authorize="hasRole('MANAGER')">
-        <h6>Xử lý phê duyệt (Dành cho Quản lý)</h6>
-        <div class="d-flex gap-2">
-            <form th:action="@{/inspection/reports/approve/{id}(id=${report.reportId})}" method="post">
-                <button type="submit" class="btn btn-success">Phê duyệt biên bản</button>
+    <!-- Manager Approval Area -->
+    <div class="no-print mt-5 bg-light p-4 rounded border border-warning" th:if="${report.status.name() == 'PENDING'}" sec:authorize="hasRole('MANAGER')">
+        <h5 class="text-warning mb-3"><i class="bi bi-shield-lock"></i> Khu vực dành cho Quản lý phê duyệt</h5>
+        <div class="d-flex gap-3">
+            <form th:action="@{/inspection/reports/approve/{id}(id=${report.reportId})}" method="post" onsubmit="return confirm('Xác nhận phê duyệt biên bản này?')">
+                <button type="submit" class="btn btn-success btn-lg">
+                    <i class="bi bi-check-circle"></i> PHÊ DUYỆT BIÊN BẢN
+                </button>
             </form>
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">Từ chối</button>
+            <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                <i class="bi bi-x-circle"></i> TỪ CHỐI
+            </button>
+        </div>
+    </div>
+
+    <!-- Display result if already handled -->
+    <div class="no-print mt-5 bg-light p-3 rounded border" th:if="${report.status.name() != 'PENDING'}">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Trạng thái: </strong>
+                <span class="badge p-2" th:classappend="${report.status.name() == 'APPROVED' ? 'bg-success' : 'bg-danger'}" th:text="${report.status}"></span>
+            </div>
+            <div th:if="${report.approvedBy != null}" class="text-muted small">
+                Người phê duyệt: <strong th:text="${report.approvedBy.fullName}"></strong> lúc <span th:text="${#temporals.format(report.approvedAt, 'HH:mm dd/MM/yyyy')}"></span>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Reject Modal (Keep standard Bootstrap) -->
+<!-- Reject Modal -->
 <div class="modal fade" id="rejectModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content text-start">
             <form th:action="@{/inspection/reports/reject/{id}(id=${report.reportId})}" method="post">
-                <div class="modal-header"><h5>Từ chối biên bản</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body"><textarea name="reason" class="form-control" placeholder="Lý do..." required></textarea></div>
-                <div class="modal-footer"><button type="submit" class="btn btn-danger">Xác nhận</button></div>
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Từ chối biên bản kiểm nhập</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label">Lý do từ chối *</label>
+                    <textarea name="reason" class="form-control" placeholder="Nhập lý do cụ thể..." required rows="4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận Từ chối</button>
+                </div>
             </form>
         </div>
     </div>

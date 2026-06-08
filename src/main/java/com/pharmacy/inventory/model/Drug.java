@@ -58,6 +58,10 @@ public class Drug {
     @Column(nullable = false)
     @Builder.Default
     private DrugStatus status = DrugStatus.DRAFT;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 }
 
 

@@ -61,13 +61,25 @@ public class DrugBatchService {
             .createdAt(LocalDateTime.now())
             .build();
 
-        // Cập nhật trạng thái Order
-        if (order.getStatus() == OrderStatus.SENT) {
-            order.setStatus(OrderStatus.RECEIVED);
-            orderRepository.save(order);
-        }
+        DrugBatch savedBatch = batchRepository.save(batch);
 
-        return batchRepository.save(batch);
+        // Cập nhật trạng thái Order: Phân biệt RECEIVED và PARTIALLY_RECEIVED
+        java.util.List<DrugBatch> registeredBatches = batchRepository.findByOrder_OrderId(order.getOrderId());
+        long registeredDrugsCount = registeredBatches.stream()
+                .map(b -> b.getDrug().getDrugId())
+                .distinct()
+                .count();
+        
+        long totalDrugsInOrder = order.getItems().size();
+
+        if (registeredDrugsCount >= totalDrugsInOrder) {
+            order.setStatus(OrderStatus.RECEIVED);
+        } else {
+            order.setStatus(OrderStatus.PARTIALLY_RECEIVED);
+        }
+        orderRepository.save(order);
+
+        return savedBatch;
     }
 }
 

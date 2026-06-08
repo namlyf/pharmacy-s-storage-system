@@ -1,87 +1,136 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{layout/base :: head('Đăng ký lô hàng')}"></head>
-<body>
+<head th:replace="~{layout/base :: head('Đăng ký & Kiểm nhập Lô hàng')}"></head>
+<body class="bg-light">
 <div th:replace="~{layout/base :: navbar}"></div>
 
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a th:href="@{/purchase/orders/view/{id}(id=${order.orderId})}">Chi tiết đơn hàng</a></li>
-            <li class="breadcrumb-item active">Đăng ký lô hàng</li>
+            <li class="breadcrumb-item"><a href="/purchase/orders">Đơn hàng</a></li>
+            <li class="breadcrumb-item"><a th:href="@{/purchase/orders/view/{id}(id=${order.orderId})}" th:text="'Đơn #' + ${order.orderId.substring(0,8)}"></a></li>
+            <li class="breadcrumb-item active">Đăng ký & Kiểm nhập</li>
         </ol>
     </nav>
 
-    <h4><i class="bi bi-box-seam"></i> Đăng ký lô thuốc nhập kho</h4>
-    <p class="text-muted">Đăng ký lô cho thuốc: <strong th:text="${drug.drugName}"></strong> (Đơn hàng: <span th:text="${order.orderId}"></span>)</p>
-    <hr>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 text-primary"><i class="bi bi-plus-square-dotted"></i> Đăng ký & Kiểm nhập thuốc: [[${drug.drugName}]]</h5>
+        </div>
+        <div class="card-body">
+            <form th:action="@{/warehouse/batches/create}" th:object="${batchRequest}" method="post">
+                <input type="hidden" th:field="*{orderId}">
+                <input type="hidden" th:field="*{drugId}">
 
-    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
-
-    <form th:action="@{/warehouse/batches/create}" th:object="${batchRequest}" method="post" class="row g-3">
-        <input type="hidden" th:field="*{orderId}">
-        <input type="hidden" th:field="*{drugId}">
-
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-light fw-bold">Thông tin lô hàng</div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Số lô</label>
-                        <input type="text" th:field="*{lotNumber}" class="form-control" required placeholder="vd: LOT12345">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Ngày sản xuất</label>
-                            <input type="date" th:field="*{manufactureDate}" class="form-control" required>
+                <div class="row g-4">
+                    <!-- Column 1: Batch & Invoice Info -->
+                    <div class="col-md-6 border-end">
+                        <h6 class="fw-bold mb-3 border-bottom pb-2 text-secondary">1. Thông tin Lô hàng & Hóa đơn</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Số lô sản xuất</label>
+                                <input type="text" th:field="*{lotNumber}" class="form-control" required placeholder="VD: LOT12345">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Số lượng thực nhận</label>
+                                <input type="number" th:field="*{quantityReceived}" class="form-control" required>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Hạn sử dụng (HSD)</label>
-                            <input type="date" th:field="*{expirationDate}" class="form-control" required>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Ngày sản xuất</label>
+                                <input type="date" th:field="*{manufactureDate}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Hạn sử dụng</label>
+                                <input type="date" th:field="*{expirationDate}" class="form-control" required id="expDate">
+                                <div id="shelfLifeAlert" class="form-text small"></div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Số hóa đơn</label>
+                                <input type="text" th:field="*{invoiceNumber}" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Ngày hóa đơn</label>
+                                <input type="date" th:field="*{invoiceDate}" class="form-control" required th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Điều kiện bảo quản (nhãn)</label>
+                            <input type="text" th:field="*{storageCondition}" class="form-control" placeholder="VD: Dưới 30 độ C, tránh ánh sáng">
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Số lượng nhập</label>
-                        <input type="number" th:field="*{quantityReceived}" class="form-control" required min="1">
+
+                    <!-- Column 2: Inspection Results -->
+                    <div class="col-md-6">
+                        <h6 class="fw-bold mb-3 border-bottom pb-2 text-secondary">2. Kết quả Kiểm nhập (BM.03)</h6>
+                        
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Giá nhập có VAT (đơn vị nhỏ nhất)</label>
+                            <div class="input-group">
+                                <input type="number" th:field="*{vatPrice}" class="form-control" required step="0.01">
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Đánh giá cảm quan</label>
+                            <textarea th:field="*{visualQualityResult}" class="form-control" rows="3" 
+                                      placeholder="VD: Bao bì nguyên vẹn, thuốc không biến màu, nhãn mác rõ ràng..."></textarea>
+                        </div>
+
+                        <div class="bg-light p-3 rounded">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" th:field="*{invoiceValid}" id="invValid">
+                                <label class="form-check-label fw-bold small" for="invValid">Hóa đơn hợp lệ</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" th:field="*{storageConditionMatch}" id="storeMatch">
+                                <label class="form-check-label fw-bold small" for="storeMatch">Điều kiện bảo quản thực tế khớp với nhãn</label>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3 py-2 small">
+                            <i class="bi bi-info-circle"></i> Lô hàng này sẽ được tự động thêm vào <strong>Danh sách chờ gửi</strong> sau khi lưu.
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-header bg-light fw-bold">Hóa đơn & Bảo quản</div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Số hóa đơn</label>
-                        <input type="text" th:field="*{invoiceNumber}" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ngày hóa đơn</label>
-                        <input type="date" th:field="*{invoiceDate}" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Điều kiện bảo quản (Theo nhãn)</label>
-                        <input type="text" th:field="*{storageCondition}" class="form-control" 
-                               th:placeholder="${drug.storageCondition}">
-                    </div>
+                <div class="mt-4 pt-3 border-top d-flex justify-content-between">
+                    <a th:href="@{/purchase/orders/view/{id}(id=${order.orderId})}" class="btn btn-light border">Hủy bỏ</a>
+                    <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save"></i> Xác nhận & Thêm vào biên bản</button>
                 </div>
-            </div>
+            </form>
         </div>
-
-        <div class="col-12 mt-4 mb-5">
-            <button type="submit" class="btn btn-primary px-5">
-                <i class="bi bi-check-circle"></i> Đăng ký lô hàng
-            </button>
-            <a th:href="@{/purchase/orders/view/{id}(id=${order.orderId})}" class="btn btn-secondary px-4 ms-2">Hủy</a>
-        </div>
-    </form>
+    </div>
 </div>
+
+<script>
+    document.getElementById('expDate').addEventListener('change', function() {
+        const expDate = new Date(this.value);
+        const today = new Date();
+        const diffTime = expDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const alertDiv = document.getElementById('shelfLifeAlert');
+        
+        if (diffDays > 0) {
+            const months = Math.floor(diffDays / 30);
+            alertDiv.textContent = `Hạn dùng còn lại: khoảng ${months} tháng (${diffDays} ngày)`;
+            alertDiv.className = diffDays > 365 ? 'form-text small text-success' : 'form-text small text-danger fw-bold';
+        } else {
+            alertDiv.textContent = 'Thuốc đã hết hạn!';
+            alertDiv.className = 'form-text small text-danger fw-bold';
+        }
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

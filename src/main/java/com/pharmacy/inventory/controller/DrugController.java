@@ -57,26 +57,40 @@ public class DrugController {
 
     @GetMapping("/edit/{id}")
     public String editForm(@PathVariable String id, Model model) {
-        var drug = drugService.getById(id);
-        var stock = drugService.getInventoryStockService().getByDrugId(id);
+        try {
+            var drug = drugService.getById(id);
+            
+            // Lấy stock, nếu chưa có (do seed data lỗi) thì tự tạo mới để tránh crash
+            com.pharmacy.inventory.model.InventoryStock stock;
+            try {
+                stock = drugService.getInventoryStockService().getByDrugId(id);
+            } catch (Exception e) {
+                // Nếu không tìm thấy stock, khởi tạo mới
+                drugService.getInventoryStockService().initializeStock(drug, 0);
+                stock = drugService.getInventoryStockService().getByDrugId(id);
+            }
 
-        DrugRequest request = new DrugRequest();
-        request.setDrugName(drug.getDrugName());
-        request.setActiveIngredient(drug.getActiveIngredient());
-        request.setConcentration(drug.getConcentration());
-        request.setDosageForm(drug.getDosageForm());
-        request.setRegistrationNumber(drug.getRegistrationNumber());
-        request.setManufacturer(drug.getManufacturer());
-        request.setCountryOfOrigin(drug.getCountryOfOrigin());
-        request.setUnit(drug.getUnit());
-        request.setPackagingSpec(drug.getPackagingSpec());
-        request.setStorageCondition(drug.getStorageCondition());
-        request.setMinimumThreshold(stock.getMinimumThreshold());
+            DrugRequest request = new DrugRequest();
+            request.setDrugName(drug.getDrugName());
+            request.setActiveIngredient(drug.getActiveIngredient());
+            request.setConcentration(drug.getConcentration());
+            request.setDosageForm(drug.getDosageForm());
+            request.setRegistrationNumber(drug.getRegistrationNumber());
+            request.setManufacturer(drug.getManufacturer());
+            request.setCountryOfOrigin(drug.getCountryOfOrigin());
+            request.setUnit(drug.getUnit());
+            request.setPackagingSpec(drug.getPackagingSpec());
+            request.setStorageCondition(drug.getStorageCondition());
+            request.setMinimumThreshold(stock.getMinimumThreshold());
 
-        model.addAttribute("drugRequest", request);
-        model.addAttribute("drugId", id);
-        model.addAttribute("dosageForms", DosageForm.values());
-        return "drug/drug-form";
+            model.addAttribute("drugRequest", request);
+            model.addAttribute("drugId", id);
+            model.addAttribute("dosageForms", DosageForm.values());
+            return "drug/drug-form";
+        } catch (Exception e) {
+            model.addAttribute("errorMsg", "Lỗi: " + e.getMessage());
+            return "redirect:/drugs";
+        }
     }
 
     @PostMapping("/edit/{id}")
